@@ -5,6 +5,7 @@
 # use a grid() geometry manager
 # python tkinter widgets: https://www.studytonight.com/tkinter/python-tkinter-widgets
 # Good tutorial/doc: https://python-textbok.readthedocs.io/en/1.0/Introduction_to_GUI_Programming.html
+# Good walkthru: https://www.youtube.com/watch?v=ibf5cx221hk
 
 
 # import tkinter as tk
