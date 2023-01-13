@@ -44,6 +44,28 @@ def create_database(db_name: str = None) -> bool:
     sStmt = """CREATE TABLE Users (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"""
     CUR.execute(sStmt)
 
+    # Persons Table
+    sStmt = """CREATE TABLE IF NOT EXISTS Persons (
+            PersonID INTEGER UNIQUE, 
+            Firstname TEXT, 
+            Lastname TEXT, 
+            Gender TEXT, 
+            Birthdate TEXT, 
+            Phone TEXT, 
+            Textable INTEGER, 
+            Email TEXT, 
+            Street1 TEXT, 
+            Street2 TEXT, 
+            City TEXT, 
+            State TEXT, 
+            Zipcode TEXT, 
+            EContactName TEXT, 
+            EContactPhone TEXT, 
+            Callsign TEXT, 
+            PRIMARY KEY(PersonID AUTOINCREMENT)
+            );"""
+    CUR.execute(sStmt)
+
     # Volunteers Table
     sStmt = """CREATE TABLE Volunteers (
             VolunteerID	INTEGER UNIQUE,
@@ -141,16 +163,12 @@ def create_settings_database(db_name: str = None) -> bool:
     CUR.execute("""INSERT INTO Settings (SettingName, SettingValue) VALUES ('DBVersion','1')""")
     CONN.commit()
 
-    # Persons Table
-    sStmt = "CREATE TABLE IF NOT EXISTS Persons (PersonID INTEGER UNIQUE, Firstname TEXT, Lastname TEXT, Gender TEXT, Birthdate TEXT, Phone TEXT, Textable INTEGER, Email TEXT, Street1 TEXT, Street2 TEXT, City TEXT, State TEXT, Zipcode TEXT, EContactName TEXT, EContactPhone TEXT, Callsign TEXT, PRIMARY KEY(PersonID AUTOINCREMENT));"
-    CUR.execute(sStmt)
-
     # Local Users Table
-    sStmt = "CREATE TABLE IF NOT EXISTS LocalUsers (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"
+    sStmt = "CREATE TABLE IF NOT EXISTS LocalUsers (UserID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"
     CUR.execute(sStmt)
 
     # Add a local admin user
-    sStmt = "INSERT INTO LocalUsers (Username, Password, PersonID, Permission) VALUEs ('admin', 'admin', -1, 1)"
+    sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
     CUR.execute(sStmt)
     CONN.commit()
 
@@ -179,25 +197,13 @@ def initialize():
     CUR.execute(stmt)
     CONN.commit()
 
-    # res = CUR.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
-    stmt = """SELECT * from mmSettings.Settings WHERE SettingName = 'DBVersion'"""
-    res = CUR.execute(stmt)
-    res.fetchall()
-    for x in res:
-        print(x)
-    # print(list(res))
+    res = CUR.execute("""SELECT SettingValue from mmSettings.Settings WHERE SettingName = 'DBVersion'""")
+    db_version = int(list(res)[0][0])
+    if db_version < 1:
+        print("Database is an older (incompatible) version. Update.")
+        exit()
+    print("Using DB Version",db_version)
 
-    stmt = """SELECT * FROM pragma_database_list;"""
-    res = CUR.execute(stmt)
-    res.fetchall()
-    for x in res:
-        print(x)
-
-    
-
-
-
-        
 
 
 # =============================================================================
