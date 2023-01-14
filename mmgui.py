@@ -98,9 +98,27 @@ class SitingWindow:
             # remove duplicate bibs (raise an error?)
             bibs = list(set(bibs))
             
+            # iterate through the list of bibs
+            for b in bibs:
+                # check if it exists in the database; add it if it doesn't
+                partID = -1
+                stmt = "select PersonID from Participants where Bib=" + b + ";"
+                res = self.cur.execute(stmt)
+                if res.rowcount < 0:
+                    # add the bib
+                    stmt = "insert into Participants (EventID,RaceID,Bib) values (1,0," + b + ");"
+                    self.cur.execute(stmt)
+                    self.cn.commit()
 
+                # get the participantID belonging to this bib
+                stmt = "select PersonID from Participants where Bib=" + b + ";"
+                res = self.cur.execute(stmt)
+                partID = list(res)[0][0]
 
-
+                # add the siting to the sitings table
+                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "');"
+                res = self.cur.execute(stmt)
+                self.cn.commit()
 
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")
             self.update_status(status)
