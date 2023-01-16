@@ -12,8 +12,9 @@
 import random
 import sqlite3
 from pathlib import Path
-import mmgui
+import guis
 from tkinter import Tk
+from tkinter import ttk
 
 
 # =============================================================================
@@ -209,11 +210,50 @@ def initialize():
 # =============================================================================
 # Main
 # 
+def main():
+    root = Tk()
+    main_frame = ttk.Frame(root)
+    main_frame.pack(fill='both',expand=True)
+
+    # Main Menu bar
+    menubar = guis.mainmenubar(main_frame)
+    root.config(menu=menubar)
+
+
+    # quick links
+    quicklinks = guis.quick_links(main_frame)
+    quicklinks.pack(side='left',fill='x')
+
+    # siting pane
+    sitings = guis.siting_window(main_frame)
+    sitings.pack(side='left',fill='y')
+
+    # Reports/Status
+    reports = guis.reports_status(main_frame)
+    reports.pack(side='left')
+    
+    # Log
+    logs = guis.logs(main_frame)
+    logs.pack(side='left', fill='x')
+    
+    # Volunteers
+    volunteers = guis.volunteers(main_frame)
+    volunteers.pack(side='right', fill='x')
+    
+    # Messages
+    messages = guis.messages(main_frame)
+    messages.pack(side='bottom',fill='y')
+
+    root.title("Marathon Manager")
+    root.geometry('450x200')
+    root.minsize(400,100)
+    root.mainloop()
+
+
+
+
+
 if __name__ == "__main__":
     initialize()
 
-
-    root = Tk()
-    sg = mmgui.SitingWindow(root)
-    root.mainloop()
-
+    main()
