@@ -220,35 +220,35 @@ def main():
     root.config(menu=menubar)
 
 
-    # quick links
-    quicklinks = guis.quick_links(main_frame)
-    # quicklinks.pack(side='left',fill='x')
-    quicklinks.grid(row=0,column=0,sticky="w",rowspan=3)
+    # # quick links
+    # quicklinks = guis.quick_links(main_frame)
+    # # quicklinks.pack(side='left',fill='x')
+    # quicklinks.grid(row=0,column=0,sticky="w",rowspan=3)
 
     # siting pane
     sitings = guis.siting_window(main_frame)
     # sitings.pack(side='left',fill='y')
     sitings.grid(row=0,column=1,sticky='n')
 
-    # Reports/Status
-    reports = guis.reports_status(main_frame)
-    # reports.pack(side='left')
-    reports.grid(row=1,column=1)
+    # # Reports/Status
+    # reports = guis.reports_status(main_frame)
+    # # reports.pack(side='left')
+    # reports.grid(row=1,column=1)
     
-    # Log
-    logs = guis.logs(main_frame)
-    # logs.pack(side='left', fill='x')
-    logs.grid(row=0,column=2,sticky='n',rowspan=2)
+    # # Log
+    # logs = guis.logs(main_frame)
+    # # logs.pack(side='left', fill='x')
+    # logs.grid(row=0,column=2,sticky='n',rowspan=2)
     
-    # Volunteers
-    volunteers = guis.volunteers(main_frame)
-    # volunteers.pack(side='right', fill='x')
-    volunteers.grid(row=0,column=3,sticky='ne',rowspan=2)
+    # # Volunteers
+    # volunteers = guis.volunteers(main_frame)
+    # # volunteers.pack(side='right', fill='x')
+    # volunteers.grid(row=0,column=3,sticky='ne',rowspan=2)
     
-    # Messages
-    messages = guis.messages(main_frame)
-    # messages.pack(side='bottom',fill='y')
-    messages.grid(row=2,column=1,sticky='s')
+    # # Messages
+    # messages = guis.messages(main_frame)
+    # # messages.pack(side='bottom',fill='y')
+    # messages.grid(row=2,column=1,sticky='s')
 
     root.title("Marathon Manager")
     root.geometry('450x200')

@@ -147,45 +147,65 @@ def event_window(main_frame: Frame) -> Frame:
     db = 'mm_test.db'
     cn,cur = None,None
 
-    ew = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
     cn = sqlite3.connect(db)
     cur = cn.cursor()
 
-    # imgLogo = ttk.canvas()
-    imgLogo = ttk.Label(ew,text="Logo goes here")
-    imgLogo.grid(row=0,column=0,columnspan=5)
+    def event_save():
+        # get the field values
+        eName = txtEventName.get()
+        eDescription = txtDescription.get()
+        eLocation = txtLocation.get()
+        eDate = txtStartDate.get()
+        eTime = txtStartTime.get()
+        eStart = eDate + ' ' + eTime
 
-    lblEventName = ttk.Label(ew,text='Event Name:',width=10)
+        # TODO: Error checking; Do the fields contain valid information
+
+        stmt = "insert into Events (EventName, Description, Location, Starttime) values ('" + eName + "','" + eDescription + "','" + eLocation + "','" + eStart + "');"
+        res =  cur.execute(stmt)
+        cn.commit()
+        main_frame.destroy()
+
+
+    def event_cancel():
+        main_frame.destroy()
+
+
+    # imgLogo = ttk.canvas()
+    imgLogo = ttk.Label(main_frame,text="Logo goes here")
+    imgLogo.grid(row=0,column=0,rowspan=5)
+
+    lblEventName = ttk.Label(main_frame,text='Event Name:',width=10)
     lblEventName.grid(row=0,column=1,sticky='W', padx=5, pady=8)
-    txtEventName = ttk.Entry(ew)
+    txtEventName = ttk.Entry(main_frame,width=25)
     txtEventName.grid(row=0,column=2, columnspan=2)
     
-    lblDescription = ttk.Label(ew,text='Description:',width=10)
+    lblDescription = ttk.Label(main_frame,text='Description:',width=10)
     lblDescription.grid(row=1,column=1)
-    txtDescription = Tk.Entry(ew,width=10,height=4)
+    txtDescription = Entry(main_frame,width=25)
     txtDescription.grid(row=1,column=2, columnspan=2)
 
-    lblLocation = ttk.Label(ew,text='Location:',width=10)
+    lblLocation = ttk.Label(main_frame,text='Location:',width=10)
     lblLocation.grid(row=2,column=1)
-    txtLocation = Tk.Entry(ew,width=10)
-    txtLocation.grid(row=2,column=2)
+    txtLocation = Entry(main_frame,width=10)
+    txtLocation.grid(row=2,column=2,sticky='w')
 
-    lblStartDate = ttk.Label(ew,text='Start Date:',width=10)
+    lblStartDate = ttk.Label(main_frame,text='Start Date:',width=10)
     lblStartDate.grid(row=3,column=1)
-    txtStartDate = Tk.Entry(ew,width=10)
-    txtStartDate.grid(row=3,column=2)
+    txtStartDate = Entry(main_frame,width=10)
+    txtStartDate.grid(row=3,column=2,sticky='w')
 
-    lblStartTime = ttk.Label(ew,text='Start Time:',width=10)
+    lblStartTime = ttk.Label(main_frame,text='Start Time:',width=10)
     lblStartTime.grid(row=4,column=1)
-    txtStartTime = Tk.Entry(ew,width=10)
-    txtStartTime.grid(row=4,column=2)
+    txtStartTime = Entry(main_frame,width=10)
+    txtStartTime.grid(row=4,column=2,sticky='w')
 
-    butSave = ttk.Button(ew,text='Save')
+    butSave = ttk.Button(main_frame,text='Save',command=event_save)
     butSave.grid(row=3,column=3)
-    butCancel = ttk.Button(ew,text='Cancel')
+    butCancel = ttk.Button(main_frame,text='Cancel',command=event_cancel)
     butCancel.grid(row=4,column=3)
-
-    return ew
+    
+    return main_frame
 
 def reports_status(main_frame: Frame) -> Frame:
     rsf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
@@ -233,9 +253,9 @@ def mainmenubar(main_frame: Frame) -> Frame:
 
     def event_click():
         e_root = Tk()
-        e_frame = ttk.Frame(e_root)
-        e_frame.pack(fill='both',expand=True)        
-        ew = event_window(e_frame)
+        e_root.title("MM: Event")
+        e_root.geometry('410x150')
+        ew = event_window(e_root)
 
     filemenu = Menu(mmb, tearoff=0)
     filemenu.add_command(label="New", command=donothing)
