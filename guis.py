@@ -143,6 +143,50 @@ def siting_window(main_frame: Frame) -> Frame:
 
     return sf
 
+def event_window(main_frame: Frame) -> Frame:
+    db = 'mm_test.db'
+    cn,cur = None,None
+
+    ew = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+    cn = sqlite3.connect(db)
+    cur = cn.cursor()
+
+    # imgLogo = ttk.canvas()
+    imgLogo = ttk.Label(ew,text="Logo goes here")
+    imgLogo.grid(row=0,column=0,columnspan=5)
+
+    lblEventName = ttk.Label(ew,text='Event Name:',width=10)
+    lblEventName.grid(row=0,column=1,sticky='W', padx=5, pady=8)
+    txtEventName = ttk.Entry(ew)
+    txtEventName.grid(row=0,column=2, columnspan=2)
+    
+    lblDescription = ttk.Label(ew,text='Description:',width=10)
+    lblDescription.grid(row=1,column=1)
+    txtDescription = Tk.Entry(ew,width=10,height=4)
+    txtDescription.grid(row=1,column=2, columnspan=2)
+
+    lblLocation = ttk.Label(ew,text='Location:',width=10)
+    lblLocation.grid(row=2,column=1)
+    txtLocation = Tk.Entry(ew,width=10)
+    txtLocation.grid(row=2,column=2)
+
+    lblStartDate = ttk.Label(ew,text='Start Date:',width=10)
+    lblStartDate.grid(row=3,column=1)
+    txtStartDate = Tk.Entry(ew,width=10)
+    txtStartDate.grid(row=3,column=2)
+
+    lblStartTime = ttk.Label(ew,text='Start Time:',width=10)
+    lblStartTime.grid(row=4,column=1)
+    txtStartTime = Tk.Entry(ew,width=10)
+    txtStartTime.grid(row=4,column=2)
+
+    butSave = ttk.Button(ew,text='Save')
+    butSave.grid(row=3,column=3)
+    butCancel = ttk.Button(ew,text='Cancel')
+    butCancel.grid(row=4,column=3)
+
+    return ew
+
 def reports_status(main_frame: Frame) -> Frame:
     rsf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
     rsf.highlightbackground="blue"
@@ -187,6 +231,12 @@ def mainmenubar(main_frame: Frame) -> Frame:
     def donothing():
         pass
 
+    def event_click():
+        e_root = Tk()
+        e_frame = ttk.Frame(e_root)
+        e_frame.pack(fill='both',expand=True)        
+        ew = event_window(e_frame)
+
     filemenu = Menu(mmb, tearoff=0)
     filemenu.add_command(label="New", command=donothing)
     filemenu.add_separator()
@@ -196,15 +246,15 @@ def mainmenubar(main_frame: Frame) -> Frame:
     filemenu.add_command(label="Exit", command=main_frame.quit)
     mmb.add_cascade(label="File", menu=filemenu) 
 
-    editmenu = Menu(mmb, tearoff=0)
-    editmenu.add_command(label="Undo", command=donothing)
-    editmenu.add_separator()
-    editmenu.add_command(label="Cut", command=donothing)
-    editmenu.add_command(label="Copy", command=donothing)
-    editmenu.add_command(label="Paste", command=donothing)
-    editmenu.add_command(label="Delete", command=donothing)
-    editmenu.add_command(label="Select All", command=donothing)
-    mmb.add_cascade(label="Edit", menu=editmenu)
+    eventmenu = Menu(mmb, tearoff=0)
+    eventmenu.add_command(label="Edit Event", command=event_click)
+    eventmenu.add_separator()
+    eventmenu.add_command(label="Checkpoints", command=donothing)
+    eventmenu.add_command(label="Courses", command=donothing)
+    eventmenu.add_command(label="Paths", command=donothing)
+    eventmenu.add_separator()
+    eventmenu.add_command(label="Participants", command=donothing)
+    mmb.add_cascade(label="Event", menu=eventmenu)
 
     helpmenu = Menu(mmb, tearoff=0)
     helpmenu.add_command(label="Help Index", command=donothing)

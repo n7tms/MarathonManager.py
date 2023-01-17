@@ -263,3 +263,12 @@ if __name__ == "__main__":
     initialize()
 
     main()
+
+
+
+# =============================================================================
+# NOTES
+# 
+# Stop trying to cram everything into one window!
+# Create a minimal main window and load the others when requested by the user.
+
