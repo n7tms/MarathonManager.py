@@ -172,6 +172,7 @@ def event_window(main_frame: Frame) -> Frame:
 
 
     # imgLogo = ttk.canvas()
+    # imgLogo = Tk.Canvas(width=100,height=100,bg='white')
     imgLogo = ttk.Label(main_frame,text="Logo goes here")
     imgLogo.grid(row=0,column=0,rowspan=5)
 
