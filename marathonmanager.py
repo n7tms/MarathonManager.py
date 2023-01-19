@@ -102,11 +102,11 @@ def create_database(db_name: str = None) -> bool:
         );"""
     CUR.execute(sStmt)
 
-    # Races Table
-    sStmt = """CREATE TABLE Races (
-            RaceID	INTEGER UNIQUE,
+    # Courses Table
+    sStmt = """CREATE TABLE Courses (
+            CourseID	INTEGER UNIQUE,
             EventID	INTEGER,
-            RaceName	TEXT,
+            CourseName	TEXT,
             Distance	TEXT,
             Color	TEXT,
             PRIMARY KEY(RaceID AUTOINCREMENT)
