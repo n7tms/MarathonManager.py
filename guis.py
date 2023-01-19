@@ -118,12 +118,13 @@ def siting_window(main_frame: Frame) -> Frame:
         sf.after(1000,update_clock)
 
 
-    sf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+    sf = Frame(main_frame,highlightbackground='blue',highlightthickness=1)
     cn = sqlite3.connect(db)
     cur = cn.cursor()
 
-    lblTime = ttk.Label(sf,width=10)
+    lblTime = ttk.Label(sf,width=10,background='#ffffff')
     lblTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
+    lblTime.config(anchor='center')
 
     cmbCheckpoint = ttk.Combobox(sf,width=10,values=get_checkpoints())
     cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
