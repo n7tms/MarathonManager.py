@@ -5,14 +5,14 @@
 # https://github.com/Akuli/tkinter-tutorial/blob/master/geometry-managers.md
 
 
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 import sqlite3
 import re
 from datetime import datetime
 
 
-def quick_links(main_frame: Frame) -> Frame:
+def quick_links(main_frame: tk.Frame) -> tk.Frame:
     qlf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
     lblMcc1 = ttk.Label(qlf,text='Marathon')
@@ -29,7 +29,7 @@ def quick_links(main_frame: Frame) -> Frame:
 
     return qlf
 
-def siting_window(main_frame: Frame) -> Frame:
+def siting_window(main_frame: tk.Frame) -> tk.Frame:
     db = 'mm_test.db'
     cn,cur = None,None
     checkpoints = []
@@ -118,7 +118,7 @@ def siting_window(main_frame: Frame) -> Frame:
         sf.after(1000,update_clock)
 
 
-    sf = Frame(main_frame,highlightbackground='blue',highlightthickness=1)
+    sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
     cn = sqlite3.connect(db)
     cur = cn.cursor()
 
@@ -144,7 +144,7 @@ def siting_window(main_frame: Frame) -> Frame:
 
     return sf
 
-def event_window(main_frame: Frame) -> Frame:
+def event_window(main_frame: tk.Frame) -> tk.Frame:
     db = 'mm_test.db'
     cn,cur = None,None
 
@@ -167,39 +167,43 @@ def event_window(main_frame: Frame) -> Frame:
         cn.commit()
         main_frame.destroy()
 
-
     def event_cancel():
         main_frame.destroy()
 
+    frame = tk.Frame(main_frame)
+    canvas = tk.Canvas(frame,width=300, height=300, bg='blue')
+    canvas.pack(expand='yes', fill='both')
+    gif1 = tk.PhotoImage(file='runner_blue.png')
+    canvas.create_image(10, 10, image=gif1, anchor='nw')
 
     # imgLogo = ttk.canvas()
     # imgLogo = Tk.Canvas(width=100,height=100,bg='white')
-    imgLogo = ttk.Label(main_frame,text="Logo goes here")
-    imgLogo.grid(row=0,column=0,rowspan=5)
+    # imgLogo = ttk.Label(main_frame,text="Logo goes here")
+    frame.grid(row=0,column=0,rowspan=5)
 
     lblEventName = ttk.Label(main_frame,text='Event Name:',width=10)
-    lblEventName.grid(row=0,column=1,sticky='W', padx=5, pady=8)
+    lblEventName.grid(row=0,column=1,sticky='w', padx=5, pady=8)
     txtEventName = ttk.Entry(main_frame,width=25)
     txtEventName.grid(row=0,column=2, columnspan=2)
     
     lblDescription = ttk.Label(main_frame,text='Description:',width=10)
     lblDescription.grid(row=1,column=1)
-    txtDescription = Entry(main_frame,width=25)
+    txtDescription = tk.Entry(main_frame,width=25)
     txtDescription.grid(row=1,column=2, columnspan=2)
 
     lblLocation = ttk.Label(main_frame,text='Location:',width=10)
     lblLocation.grid(row=2,column=1)
-    txtLocation = Entry(main_frame,width=10)
+    txtLocation = tk.Entry(main_frame,width=10)
     txtLocation.grid(row=2,column=2,sticky='w')
 
     lblStartDate = ttk.Label(main_frame,text='Start Date:',width=10)
     lblStartDate.grid(row=3,column=1)
-    txtStartDate = Entry(main_frame,width=10)
+    txtStartDate = tk.Entry(main_frame,width=10)
     txtStartDate.grid(row=3,column=2,sticky='w')
 
     lblStartTime = ttk.Label(main_frame,text='Start Time:',width=10)
     lblStartTime.grid(row=4,column=1)
-    txtStartTime = Entry(main_frame,width=10)
+    txtStartTime = tk.Entry(main_frame,width=10)
     txtStartTime.grid(row=4,column=2,sticky='w')
 
     butSave = ttk.Button(main_frame,text='Save',command=event_save)
@@ -209,19 +213,19 @@ def event_window(main_frame: Frame) -> Frame:
     
     return main_frame
 
-def reports_status(main_frame: Frame) -> Frame:
-    rsf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+def reports_status(main_frame: tk.Frame) -> tk.Frame:
+    rsf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
     rsf.highlightbackground="blue"
     rsf.highlightthickness=1
 
     lblTitle = ttk.Label(rsf,text='Reports/Status')
 
-    lblTitle.grid(row=0,column=0,sticky='W', padx=5, pady=8)
+    lblTitle.grid(row=0,column=0,sticky='w', padx=5, pady=8)
 
     return rsf
 
-def logs(main_frame: Frame) -> Frame:
-    lf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+def logs(main_frame: tk.Frame) -> tk.Frame:
+    lf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
     lblTitle = ttk.Label(lf,text='Log')
 
@@ -229,8 +233,8 @@ def logs(main_frame: Frame) -> Frame:
 
     return lf
 
-def volunteers(main_frame: Frame) -> Frame:
-    vf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+def volunteers(main_frame: tk.Frame) -> tk.Frame:
+    vf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
     lblTitle = ttk.Label(vf,text='Volunteers')
 
@@ -238,8 +242,8 @@ def volunteers(main_frame: Frame) -> Frame:
 
     return vf
 
-def messages(main_frame: Frame) -> Frame:
-    mf = Frame(main_frame,highlightbackground="blue",highlightthickness=1)
+def messages(main_frame: tk.Frame) -> tk.Frame:
+    mf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
     lblTitle = ttk.Label(mf,text='Messages')
 
@@ -247,19 +251,19 @@ def messages(main_frame: Frame) -> Frame:
 
     return mf   
 
-def mainmenubar(main_frame: Frame) -> Frame:
-    mmb = Menu(main_frame)
+def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
+    mmb = tk.Menu(main_frame)
 
     def donothing():
         pass
 
     def event_click():
-        e_root = Tk()
+        e_root = tk.Tk()
         e_root.title("MM: Event")
         e_root.geometry('410x150')
         ew = event_window(e_root)
 
-    filemenu = Menu(mmb, tearoff=0)
+    filemenu = tk.Menu(mmb, tearoff=0)
     filemenu.add_command(label="New", command=donothing)
     filemenu.add_separator()
     filemenu.add_command(label="Open", command=donothing)
@@ -268,7 +272,7 @@ def mainmenubar(main_frame: Frame) -> Frame:
     filemenu.add_command(label="Exit", command=main_frame.quit)
     mmb.add_cascade(label="File", menu=filemenu) 
 
-    eventmenu = Menu(mmb, tearoff=0)
+    eventmenu = tk.Menu(mmb, tearoff=0)
     eventmenu.add_command(label="Edit Event", command=event_click)
     eventmenu.add_separator()
     eventmenu.add_command(label="Checkpoints", command=donothing)
@@ -278,7 +282,7 @@ def mainmenubar(main_frame: Frame) -> Frame:
     eventmenu.add_command(label="Participants", command=donothing)
     mmb.add_cascade(label="Event", menu=eventmenu)
 
-    helpmenu = Menu(mmb, tearoff=0)
+    helpmenu = tk.Menu(mmb, tearoff=0)
     helpmenu.add_command(label="Help Index", command=donothing)
     helpmenu.add_command(label="About...", command=donothing)
     mmb.add_cascade(label="Help", menu=helpmenu)

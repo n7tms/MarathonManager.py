@@ -2,8 +2,15 @@ import tkinter as tk
 from tkinter.constants import *
 
 
+window = tk.Tk()
+window.title("Logo Test")
+
+frame = tk.Frame(window)
+frame.pack()
+
+
 # Create the canvas, size in pixels.
-canvas = tk.Canvas(width=300, height=300, bg='white')
+canvas = tk.Canvas(frame,width=300, height=300, bg='blue')
 
 # Pack the canvas into the Frame.
 canvas.pack(expand=YES, fill=BOTH)
