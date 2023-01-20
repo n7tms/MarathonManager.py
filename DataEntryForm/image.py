@@ -13,7 +13,8 @@ frame.pack()
 canvas = tk.Canvas(frame,width=300, height=300, bg='blue')
 
 # Pack the canvas into the Frame.
-canvas.pack(expand=YES, fill=BOTH)
+# canvas.pack(expand=YES, fill=BOTH)
+canvas.grid(row=0,column=0)
 
 # Load the .gif image file.
 gif1 = tk.PhotoImage(file='runner_blue.png')

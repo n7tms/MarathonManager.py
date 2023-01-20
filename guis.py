@@ -10,6 +10,7 @@ from tkinter import ttk
 import sqlite3
 import re
 from datetime import datetime
+from PIL import ImageTk, Image
 
 
 def quick_links(main_frame: tk.Frame) -> tk.Frame:
@@ -170,16 +171,10 @@ def event_window(main_frame: tk.Frame) -> tk.Frame:
     def event_cancel():
         main_frame.destroy()
 
-    frame = tk.Frame(main_frame)
-    canvas = tk.Canvas(frame,width=300, height=300, bg='blue')
-    canvas.pack(expand='yes', fill='both')
-    gif1 = tk.PhotoImage(file='runner_blue.png')
-    canvas.create_image(10, 10, image=gif1, anchor='nw')
-
-    # imgLogo = ttk.canvas()
-    # imgLogo = Tk.Canvas(width=100,height=100,bg='white')
-    # imgLogo = ttk.Label(main_frame,text="Logo goes here")
-    frame.grid(row=0,column=0,rowspan=5)
+    # img1 = Image.open('runner_blue.png')
+    img2 = ImageTk.PhotoImage(file='runner_blue.png')
+    imgLogo = ttk.Label(main_frame,image=img2)
+    imgLogo.grid(row=0,column=0,rowspan=5)
 
     lblEventName = ttk.Label(main_frame,text='Event Name:',width=10)
     lblEventName.grid(row=0,column=1,sticky='w', padx=5, pady=8)
