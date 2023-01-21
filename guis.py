@@ -246,6 +246,78 @@ def messages(main_frame: tk.Frame) -> tk.Frame:
 
     return mf   
 
+def checkpoint_filldata(tv:ttk.Treeview) -> None:
+    """Clear and then fill/refresh the Checkpoints table with data"""
+    # clear the table
+    for item in tv.get_children():
+        tv.delete(item)
+
+    # get the checkpoints from the database
+    cn = sqlite3.connect(DB)
+    cur = cn.cursor()
+    cur.execute("select CheckpointID, CPName, Description, 'somewhere' from Checkpoints;")
+    rows = cur.fetchall()
+    for row in rows:
+        tv.insert("",tk.END,values=row)
+
+def checkpoint_edit(checkpoint,tv):
+    cpid,cname,cdescription,clocation = checkpoint
+
+    def cancel():
+        croot.destroy()
+
+    def save():
+        cn = sqlite3.connect(DB)
+        cur = cn.cursor()
+
+        cpid = txtCPID.get()
+        cname=txtName.get()
+        cdescription = txtDescr.get()
+        clocation = txtLoc.get()
+        cur.execute("update Checkpoints set CPName=?, Description=? where CheckpointID=?",[cname,cdescription,cpid])
+        cn.commit()
+
+        checkpoint_filldata(tv)
+        croot.destroy()
+
+    croot = tk.Tk()
+    croot.title("MM: Edit Checkpoint")
+    croot.geometry('250x150')
+
+    lblCPID = ttk.Label(croot,text="Checkpoint ID:")
+    lblCPID.grid(row=0,column=0,sticky='e')
+    txtCPID = ttk.Entry(croot)
+    txtCPID.grid(row=0,column=1,columnspan=2,sticky='w')
+    txtCPID.insert(0,cpid)
+    txtCPID.config(state="disabled")
+
+    lblName = ttk.Label(croot,text="Name:")
+    lblName.grid(row=1,column=0,sticky='e')
+    txtName = ttk.Entry(croot)
+    txtName.grid(row=1,column=1,columnspan=2,sticky='w')
+    txtName.insert(0,cname)
+
+    lblDescr = ttk.Label(croot,text="Description:")
+    lblDescr.grid(row=2,column=0,sticky='e')
+    txtDescr = ttk.Entry(croot)
+    txtDescr.grid(row=2,column=1,columnspan=2,sticky='w')
+    txtDescr.insert(0,cdescription)
+
+    lblLoc = ttk.Label(croot,text="Location:")
+    lblLoc.grid(row=3,column=0,sticky='e')
+    txtLoc = ttk.Entry(croot)
+    txtLoc.grid(row=3,column=1,columnspan=2,sticky='w')
+    txtLoc.insert(0,clocation)
+
+    butSave = ttk.Button(croot,text="Save",command=save)
+    butSave.grid(row=4,column=1,sticky='e')
+
+    butCancel = ttk.Button(croot,text="Cancel",command=cancel)
+    butCancel.grid(row=4,column=2,sticky='w')
+
+
+    
+
 
 def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     cn,cur = None,None
@@ -253,23 +325,8 @@ def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     cn = sqlite3.connect(DB)
     cur = cn.cursor()
 
-    def checkpoint_save():
-        # get the field values
-        eName = txtEventName.get()
-        eDescription = txtDescription.get()
-        eLocation = txtLocation.get()
-        eDate = txtStartDate.get()
-        eTime = txtStartTime.get()
-        eStart = eDate + ' ' + eTime
 
-        # TODO: Error checking; Do the fields contain valid information
-
-        stmt = "insert into Events (EventName, Description, Location, Starttime) values ('" + eName + "','" + eDescription + "','" + eLocation + "','" + eStart + "');"
-        res =  cur.execute(stmt)
-        cn.commit()
-        main_frame.destroy()
-
-    def checkpoint_cancel():
+    def checkpoint_close():
         main_frame.destroy()
 
     def checkpoint_new():
@@ -278,12 +335,9 @@ def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     def checkpoint_map():
         print("Map Checkpoint")
 
-    def checkpoint_filldata():
-        cur.execute("select CPName, Description, 'somewhere','edit' from Checkpoints;")
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
-            tvCheckpoints.insert("",tk.END,values=row)
+    def checkpoint_edit_row(event):
+        item = tvCheckpoints.item(tvCheckpoints.focus(),"values")
+        checkpoint_edit(item,tvCheckpoints)
 
     title = ttk.Label(main_frame,text='Checkpoints',font=('Arial',18))
     title.grid(row=0,column=0,columnspan=2,sticky='nw')
@@ -297,36 +351,44 @@ def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     btnMap = ttk.Button(main_frame,text="Map Checkpoints",command=checkpoint_map)
     btnMap.grid(row=1,column=1,padx=5,pady=5,sticky='w')
 
-    # tvCheckpoints = ttk.Treeview(main_frame,column=("Checkpoint","Description","Location","Edit"),show='headings')
     tvCheckpoints = ttk.Treeview(main_frame,column=("c1","c2","c3","c4"),show='headings',selectmode='browse')
-    tvCheckpoints.column("#1",anchor='w')
-    tvCheckpoints.heading("#1",text="Checkpoint")
+    tvCheckpoints.column("#1",anchor='center')
+    tvCheckpoints.heading("#1",text="CP ID")
     tvCheckpoints.column("#2",anchor='w')
-    tvCheckpoints.heading("#2",text="Description")
+    tvCheckpoints.heading("#2",text="Checkpoint")
     tvCheckpoints.column("#3",anchor='w')
-    tvCheckpoints.heading("#3",text="Location")
-    tvCheckpoints.column("#4",anchor='center')
-    tvCheckpoints.heading("#4",text="Edit")
+    tvCheckpoints.heading("#3",text="Description")
+    tvCheckpoints.column("#4",anchor='w')
+    tvCheckpoints.heading("#4",text="Location")
     tvCheckpoints.grid(row=2,column=0,columnspan=3,padx=5,pady=5)
-    checkpoint_filldata()
+    tvCheckpoints.bind("<Double-1>",checkpoint_edit_row)
+    checkpoint_filldata(tvCheckpoints)
 
-    btnSave = ttk.Button(main_frame,text="Save",command=checkpoint_save)
-    btnSave.grid(row=3,column=1,padx=5,pady=5,sticky='e')
+    btnClose = ttk.Button(main_frame,text="Close",command=checkpoint_close)
+    btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
-    btnCancel = ttk.Button(main_frame,text="Cancel",command=checkpoint_cancel)
-    btnCancel.grid(row=3,column=2,padx=5,pady=5,sticky='w')
+def courses_filldata(tv:ttk.Treeview) -> None:
+    """Clear and then fill/refresh the Courses table with data"""
+    # clear the table
+    for item in tv.get_children():
+        tv.delete(item)
+
+    # get the courses from the database
+    cn = sqlite3.connect(DB)
+    cur = cn.cursor()
+    cur.execute("select CourseID, CourseName, Distance, Color from Courses;")
+    rows = cur.fetchall()
+    
+    # populate the treeview with the data
+    for row in rows:
+        tv.tag_configure(str(row[0]),background=row[3])
+        tv.insert("",tk.END,values=row,tags=str(row[0]))
 
 
-def course_edit(item):
-    # display the form
-    # fill the form
-    # save the edited form
+def course_edit(item,tv):
     cid,cname,cdistance,ccolor = item
-    print("Editing:",cid,cname,cdistance,ccolor)
-
 
     def cancel():
-        print("course edit canceled")
         c_root.destroy()
     
     def save():
@@ -336,9 +398,10 @@ def course_edit(item):
         cname=txtName.get()
         cdistance=txtDistance.get()
         ccolor=txtColor.get()
-        # cur.execute("update Courses set CourseName=?, Distance=?, Color=? where CourseID=?",[cname,cdistance,ccolor,cid])
-        cur.execute("update Courses set CourseName='Full', Distance='26.2' where CourseID=3")
-        cn.commit
+        cur.execute("update Courses set CourseName=?, Distance=?, Color=? where CourseID=?",[cname,cdistance,ccolor,cid])
+        cn.commit()
+
+        courses_filldata(tv)
 
         c_root.destroy()
 
@@ -385,48 +448,33 @@ def courses_window(main_frame:tk.Frame) -> tk.Frame:
     cn = sqlite3.connect(DB)
     cur = cn.cursor()
 
-    def courses_save():
-        # get the field values
-        # eName = txtEventName.get()
-        # eDescription = txtDescription.get()
-        # eLocation = txtLocation.get()
-        # eDate = txtStartDate.get()
-        # eTime = txtStartTime.get()
-        # eStart = eDate + ' ' + eTime
 
-        # # TODO: Error checking; Do the fields contain valid information
-
-        # stmt = "insert into Events (EventName, Description, Location, Starttime) values ('" + eName + "','" + eDescription + "','" + eLocation + "','" + eStart + "');"
-        # res =  cur.execute(stmt)
-        # cn.commit()
-        print("courses saved")
-        main_frame.destroy()
-
-    def courses_cancel():
+    def courses_close():
+        """Close the courses window"""
         main_frame.destroy()
 
     def courses_new():
+        """Create a new course"""
         print("New Course")
 
-    def courses_filldata():
-        # clear the table
-        for item in tvCourses.get_children():
-            tvCourses.delete(item)
+    # def courses_filldata(tv:ttk.Treeview) -> None:
+    #     """Clear and then fill/refresh the Courses table with data"""
+    #     # clear the table
+    #     for item in tvCourses.get_children():
+    #         tvCourses.delete(item)
 
-        # get the courses from the database
-        cur.execute("select CourseID, CourseName, Distance, Color from Courses;")
-        rows = cur.fetchall()
+    #     # get the courses from the database
+    #     cur.execute("select CourseID, CourseName, Distance, Color from Courses;")
+    #     rows = cur.fetchall()
         
-        # populate the treeview with the data
-        for row in rows:
-            tvCourses.tag_configure(str(row[0]),background=row[3])
-            tvCourses.insert("",tk.END,values=row,tags=str(row[0]))
+    #     # populate the treeview with the data
+    #     for row in rows:
+    #         tvCourses.tag_configure(str(row[0]),background=row[3])
+    #         tvCourses.insert("",tk.END,values=row,tags=str(row[0]))
 
     def courses_edit_row(event):
         item = tvCourses.item(tvCourses.focus(),"values")
-        print("Clicked:",item)
-        course_edit(item)
-        courses_filldata()
+        course_edit(item,tvCourses)
 
     title = ttk.Label(main_frame,text='Courses',font=('Arial',18))
     title.grid(row=0,column=0,sticky='nw')
@@ -448,13 +496,10 @@ def courses_window(main_frame:tk.Frame) -> tk.Frame:
     tvCourses.heading("#4",text="Color")
     tvCourses.grid(row=2,column=0,columnspan=3,padx=5,pady=5)
     tvCourses.bind("<Double-1>",courses_edit_row)
-    courses_filldata()
+    courses_filldata(tvCourses)
 
-    btnSave = ttk.Button(main_frame,text="Save",command=courses_save)
-    btnSave.grid(row=3,column=1,padx=5,pady=5,sticky='e')
-
-    btnCancel = ttk.Button(main_frame,text="Cancel",command=courses_cancel)
-    btnCancel.grid(row=3,column=2,padx=5,pady=5,sticky='w')
+    btnClose = ttk.Button(main_frame,text="Close",command=courses_close)
+    btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
 
 
