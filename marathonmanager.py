@@ -272,3 +272,10 @@ if __name__ == "__main__":
 # Stop trying to cram everything into one window!
 # Create a minimal main window and load the others when requested by the user.
 
+
+# TODO
+#
+# create a new checkpoint
+# create a new course
+# make the "path" part of the course table
+
