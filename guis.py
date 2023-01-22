@@ -560,6 +560,10 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     def donothing():
         pass
 
+    def new_database():
+        pass
+
+    
     def event_click():
         e_root = tk.Tk()
         e_root.title("MM: Event")
