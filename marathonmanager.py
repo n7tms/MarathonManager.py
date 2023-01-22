@@ -274,8 +274,6 @@ if __name__ == "__main__":
 
 
 # TODO
-#
-# create a new checkpoint
-# create a new course
 # make the "path" part of the course table
+# 
 
