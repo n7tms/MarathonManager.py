@@ -109,6 +109,7 @@ def create_database(db_name: str = None) -> bool:
             CourseName	TEXT,
             Distance	TEXT,
             Color	TEXT,
+            Path    TEXT,
             PRIMARY KEY(RaceID AUTOINCREMENT)
         );"""
     CUR.execute(sStmt)
@@ -274,6 +275,6 @@ if __name__ == "__main__":
 
 
 # TODO
-# make the "path" part of the course table
+# 
 # 
 
