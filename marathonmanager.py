@@ -20,8 +20,6 @@ import re
 from datetime import datetime
 # from PIL import ImageTk, Image
 
-DB = 'mm_test.db'
-
 
 # =============================================================================
 # Constants
@@ -276,7 +274,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")
 
             update_status(status)
-            txtBibs.delete(0,END)
+            txtBibs.delete(0,'end')
         else:
             update_status("Problem. Check checkpoints or bibs.")
 
@@ -286,39 +284,39 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         current_time = now.strftime("%H:%M:%S")
 
         lblTime.configure(text=current_time)
-        sf.after(1000,update_clock)
+        main_frame.after(1000,update_clock)
 
 
-    sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
-    cn = sqlite3.connect(DB)
+    # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
 
-    lblTime = ttk.Label(sf,width=10,background='#ffffff')
+    lblTime = ttk.Label(main_frame,width=10,background='#ffffff')
     lblTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
     lblTime.config(anchor='center')
 
-    cmbCheckpoint = ttk.Combobox(sf,width=10,values=get_checkpoints())
+    cmbCheckpoint = ttk.Combobox(main_frame,width=10,values=get_checkpoints())
     cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
     cmbCheckpoint.set(checkpoints[0][1])
 
-    txtBibs = ttk.Entry(sf,width=30)
+    txtBibs = ttk.Entry(main_frame,width=30)
     txtBibs.grid(row=0,column=2,sticky='W',  padx=5, pady=8)
     txtBibs.bind("<KeyPress>",bib_enterkey)
 
-    butSubmit = ttk.Button(sf,text='Submit',width=10,command=submit_bibs)
+    butSubmit = ttk.Button(main_frame,text='Submit',width=10,command=submit_bibs)
     butSubmit.grid(row=0,column=3,sticky='W',  padx=5, pady=8)
 
-    lblStatus = ttk.Label(sf,text='this is where the status goes', relief="sunken")
+    lblStatus = ttk.Label(main_frame,text='this is where the status goes', relief="sunken")
     lblStatus.grid(row=1,column=0,columnspan=4,sticky='we')
 
     update_clock()
 
-    return sf
+    # return sf
 
 def event_window(main_frame: tk.Frame) -> tk.Frame:
     cn,cur = None,None
 
-    cn = sqlite3.connect(DB)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
 
     def event_save():
@@ -422,7 +420,7 @@ def checkpoint_filldata(tv:ttk.Treeview) -> None:
         tv.delete(item)
 
     # get the checkpoints from the database
-    cn = sqlite3.connect(DB)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
     cur.execute("select CheckpointID, CPName, Description, 'somewhere' from Checkpoints;")
     rows = cur.fetchall()
@@ -440,7 +438,7 @@ def checkpoint_edit(checkpoint,tv):
 
     def save():
         """Create/insert a new Checkpoint"""
-        cn = sqlite3.connect(DB)
+        cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
 
         cpid = txtCPID.get()
@@ -455,7 +453,7 @@ def checkpoint_edit(checkpoint,tv):
 
     def update():
         """Update an existing Checkpoint"""
-        cn = sqlite3.connect(DB)
+        cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
 
         cpid = txtCPID.get()
@@ -512,7 +510,7 @@ def checkpoint_edit(checkpoint,tv):
 def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     cn,cur = None,None
 
-    cn = sqlite3.connect(DB)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
 
 
@@ -564,7 +562,7 @@ def courses_filldata(tv:ttk.Treeview) -> None:
         tv.delete(item)
 
     # get the courses from the database
-    cn = sqlite3.connect(DB)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
     cur.execute("select CourseID, CourseName, Distance, Color, Path from Courses;")
     rows = cur.fetchall()
@@ -587,7 +585,7 @@ def course_edit(item,tv):
     
     def save():
         """Create a new Course"""
-        cn = sqlite3.connect(DB)
+        cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
 
         cname = txtName.get()
@@ -602,7 +600,7 @@ def course_edit(item,tv):
 
     def update():
         """Update an existing Course"""
-        cn = sqlite3.connect(DB)
+        cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
 
         cname = txtName.get()
@@ -677,7 +675,7 @@ def course_edit(item,tv):
 def courses_window(main_frame:tk.Frame) -> tk.Frame:
     cn,cur = None,None
 
-    cn = sqlite3.connect(DB)
+    cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
 
 
@@ -765,7 +763,6 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     eventmenu.add_separator()
     eventmenu.add_command(label="Checkpoints", command=checkpoints_click)
     eventmenu.add_command(label="Courses", command=courses_click)
-    eventmenu.add_command(label="Paths", command=donothing)
     eventmenu.add_separator()
     eventmenu.add_command(label="Participants", command=donothing)
     mmb.add_cascade(label="Event", menu=eventmenu)
@@ -827,17 +824,33 @@ def main():
     menubar = mainmenubar(main_frame)
     root.config(menu=menubar)
 
+    def open_sitings():
+        sitings = tk.Tk()
+        sitings.title("MM: Sitings")
+        sitings.geometry('450x340')
+        sw = siting_window(sitings)
+        # sitings.grid(row=0,column=1,sticky='n')
 
-    # # quick links
-    # quicklinks = guis.quick_links(main_frame)
-    # # quicklinks.pack(side='left',fill='x')
-    # quicklinks.grid(row=0,column=0,sticky="w",rowspan=3)
+    def open_reports():
+        root = tk.Tk()
+        root.title("MM: Checkpoints")
+        root.geometry('825x340')
+        ew = checkpoint_window(root)
 
-    # siting pane
-    sitings = siting_window(main_frame)
-    # sitings.pack(side='left',fill='y')
-    sitings.grid(row=0,column=1,sticky='n')
+    def open_log():
+        pass
 
+    def open_volunteers():
+        pass
+
+    def open_messages():
+        pass
+    
+
+    btnSitings = ttk.Button(main_frame,text="Sitings",command=open_sitings)
+    btnSitings.grid(row=1,column=0,padx=10,pady=10,sticky='news')
+
+    
     # # Reports/Status
     # reports = guis.reports_status(main_frame)
     # # reports.pack(side='left')
@@ -882,6 +895,6 @@ if __name__ == "__main__":
 
 
 # TODO
-# 
+# put a treeview of sitings on the sitings window
 # 
 
