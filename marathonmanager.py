@@ -199,9 +199,29 @@ def quick_links(main_frame: tk.Frame) -> tk.Frame:
 
     return qlf
 
+
+
+
+
+# =============================================================================
+#  Sitings Window
+# =============================================================================
+
 def siting_window(main_frame: tk.Frame) -> tk.Frame:
     cn,cur = None,None
     checkpoints = []
+
+    def sitings_filldata(tv:ttk.Treeview):
+        for item in tv.get_children():
+            tv.delete(item)
+        
+        cn = sqlite3.connect(DB_NAME)
+        cur = cn.cursor()
+        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.Bib || ' ' || pe.Firstname || ' ' || pe.Lastname from Sitings as s, Checkpoints as c, Participants as pa, Persons as pe where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID and pa.PersonID=pe.PersonID order by s.SitingTime DESC;")
+        rows = cur.fetchall()
+
+        for row in rows:
+            tv.insert("",'end',values=row,tags=str(row[0]))
 
     def get_checkpoints() -> list:
         """return a list of checkpoints"""
@@ -275,6 +295,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
             update_status(status)
             txtBibs.delete(0,'end')
+            sitings_filldata(tvSitings)
         else:
             update_status("Problem. Check checkpoints or bibs.")
 
@@ -285,6 +306,10 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
         lblTime.configure(text=current_time)
         main_frame.after(1000,update_clock)
+
+    def sitings_edit_row(event):
+        item = tvSitings.item(tvSitings.focus(),"values")
+        print(item)
 
 
     # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
@@ -307,7 +332,27 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
     butSubmit.grid(row=0,column=3,sticky='W',  padx=5, pady=8)
 
     lblStatus = ttk.Label(main_frame,text='this is where the status goes', relief="sunken")
-    lblStatus.grid(row=1,column=0,columnspan=4,sticky='we')
+    lblStatus.grid(row=1,column=0,columnspan=4,sticky='we',padx=5)
+
+    tvSitings = ttk.Treeview(main_frame,column=("c1","c2","c3","c4"),show='headings',selectmode='browse')
+    tvSitings.column("#1",anchor='w',minwidth=30,width=60,stretch='no')
+    tvSitings.heading("#1",text="ID",anchor='w')
+    tvSitings.column("#2",anchor='w',minwidth=30,width=110,stretch='no')
+    tvSitings.heading("#2",text="Time",anchor='w')
+    tvSitings.column("#3",anchor='w',minwidth=30,width=100,stretch='no')
+    tvSitings.heading("#3",text="Checkpoint",anchor='w')
+    tvSitings.column("#4",anchor='w',minwidth=30,width=240,stretch='no')
+    tvSitings.heading("#4",text="Participant",anchor='w')
+    tvSitings.grid(row=2,column=0,columnspan=4,padx=5,pady=15)
+    tvSitings.bind("<Double-1>",sitings_edit_row)
+
+    yscrollbar = ttk.Scrollbar(main_frame,orient='vertical',command=tvSitings.yview)
+    yscrollbar.grid(row=2, column=5, sticky='nse')
+    yscrollbar.configure(command=tvSitings.yview)    
+    tvSitings.configure(yscrollcommand=yscrollbar.set)
+
+    sitings_filldata(tvSitings)
+    
 
     update_clock()
 
@@ -827,7 +872,7 @@ def main():
     def open_sitings():
         sitings = tk.Tk()
         sitings.title("MM: Sitings")
-        sitings.geometry('450x340')
+        sitings.geometry('550x320')
         sw = siting_window(sitings)
         # sitings.grid(row=0,column=1,sticky='n')
 
@@ -895,6 +940,8 @@ if __name__ == "__main__":
 
 
 # TODO
-# put a treeview of sitings on the sitings window
+# when adding unknown bib, add a person record, too.
+# add hidden columns in tvSitings for CheckpointID and ParticipantID
+# Create the edit siting window and function
 # 
 
