@@ -371,6 +371,13 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
     # return sf
 
+
+
+
+# =============================================================================
+#  Event Window
+# =============================================================================
+
 def event_window(main_frame: tk.Frame) -> tk.Frame:
     cn,cur = None,None
 
@@ -433,6 +440,13 @@ def event_window(main_frame: tk.Frame) -> tk.Frame:
     
     return main_frame
 
+
+
+
+# =============================================================================
+#  Report/Status Panel
+# =============================================================================
+
 def reports_status(main_frame: tk.Frame) -> tk.Frame:
     rsf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
     rsf.highlightbackground="blue"
@@ -444,6 +458,14 @@ def reports_status(main_frame: tk.Frame) -> tk.Frame:
 
     return rsf
 
+
+
+
+
+# =============================================================================
+#  Log Panel
+# =============================================================================
+
 def logs(main_frame: tk.Frame) -> tk.Frame:
     lf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
@@ -452,6 +474,14 @@ def logs(main_frame: tk.Frame) -> tk.Frame:
     lblTitle.grid(row=0,column=0,sticky='W', padx=5, pady=8)
 
     return lf
+
+
+
+
+
+# =============================================================================
+#  Volunteer Window
+# =============================================================================
 
 def volunteers(main_frame: tk.Frame) -> tk.Frame:
     vf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
@@ -462,6 +492,14 @@ def volunteers(main_frame: tk.Frame) -> tk.Frame:
 
     return vf
 
+
+
+
+
+# =============================================================================
+#  Messages Panel
+# =============================================================================
+
 def messages(main_frame: tk.Frame) -> tk.Frame:
     mf = tk.Frame(main_frame,highlightbackground="blue",highlightthickness=1)
 
@@ -471,6 +509,15 @@ def messages(main_frame: tk.Frame) -> tk.Frame:
 
     return mf   
 
+
+
+
+
+# =============================================================================
+#  Report/Status Panel
+# =============================================================================
+
+# Should these checkpoint functions be inside the checkpoint window definition?
 def checkpoint_filldata(tv:ttk.Treeview) -> None:
     """Clear and then fill/refresh the Checkpoints table with data"""
     # clear the table
@@ -613,6 +660,15 @@ def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     btnClose = ttk.Button(main_frame,text="Close",command=checkpoint_close)
     btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
+
+
+
+
+# =============================================================================
+#  Courses Window
+# =============================================================================
+
+# Should these course functions be inside the course window definition?
 def courses_filldata(tv:ttk.Treeview) -> None:
     """Clear and then fill/refresh the Courses table with data"""
     # clear the table
@@ -777,6 +833,14 @@ def courses_window(main_frame:tk.Frame) -> tk.Frame:
     btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
 
+
+
+
+
+
+# =============================================================================
+#  Main Menu Bar
+# =============================================================================
 
 def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     mmb = tk.Menu(main_frame)
