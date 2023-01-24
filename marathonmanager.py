@@ -1012,10 +1012,9 @@ if __name__ == "__main__":
 # =============================================================================
 # NOTES
 # 
-# Stop trying to cram everything into one window!
-# Create a minimal main window and load the others when requested by the user.
+# 
 
-
+# =============================================================================
 # TODO
 # add hidden columns in tvSitings for CheckpointID and ParticipantID
 # Create the edit siting window and function
