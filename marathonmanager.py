@@ -49,9 +49,9 @@ def create_database(db_name: str = None) -> bool:
     sStmt = """CREATE TABLE Users (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"""
     CUR.execute(sStmt)
 
-    # Persons Table
-    sStmt = """CREATE TABLE IF NOT EXISTS Persons (
-            PersonID INTEGER UNIQUE, 
+    # Volunteers Table
+    sStmt = """CREATE TABLE IF NOT EXISTS Volunteers (
+            VolunteerID INTEGER UNIQUE, 
             Firstname TEXT, 
             Lastname TEXT, 
             Gender TEXT, 
@@ -71,10 +71,9 @@ def create_database(db_name: str = None) -> bool:
             );"""
     CUR.execute(sStmt)
 
-    # Volunteers Table
-    sStmt = """CREATE TABLE Volunteers (
+    # Volunteer Log Table (history of assignments, check-ins and -outs)
+    sStmt = """CREATE TABLE VolLog (
             VolunteerID	INTEGER UNIQUE,
-            PersonID	INTEGER,
             EventID	INTEGER,
             Assignment	TEXT,
             Checkin	TEXT,
@@ -85,7 +84,21 @@ def create_database(db_name: str = None) -> bool:
 
     # Participants Table
     sStmt = """CREATE TABLE Participants (
-            PersonID	INTEGER UNIQUE,
+            ParticipantID	INTEGER UNIQUE,
+            Firstname TEXT, 
+            Lastname TEXT, 
+            Gender TEXT, 
+            Birthdate TEXT, 
+            Phone TEXT, 
+            Textable INTEGER, 
+            Email TEXT, 
+            Street1 TEXT, 
+            Street2 TEXT, 
+            City TEXT, 
+            State TEXT, 
+            Zipcode TEXT, 
+            EContactName TEXT, 
+            EContactPhone TEXT, 
             EventID	INTEGER,
             RaceID	INTEGER,
             Bib	INTEGER,
@@ -273,16 +286,16 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
             for b in bibs:
                 # check if it exists in the database; add it if it doesn't
                 partID = -1
-                stmt = "select PersonID from Participants where Bib=" + b + ";"
+                stmt = "select ParticipantID from Participants where Bib=" + b + ";"
                 res = list(cur.execute(stmt))
                 if len(res) == 0:
-                    # add the bib
+                    # add the bib to Participants
                     stmt = "insert into Participants (EventID,RaceID,Bib) values (1,0," + b + ");"
                 cur.execute(stmt)
                 cn.commit()
 
                 # get the participantID belonging to this bib
-                stmt = "select PersonID from Participants where Bib=" + b + ";"
+                stmt = "select ParticipantID from Participants where Bib=" + b + ";"
                 res = list(cur.execute(stmt))
                 partID = res[0][0]
 
@@ -940,8 +953,9 @@ if __name__ == "__main__":
 
 
 # TODO
-# when adding unknown bib, add a person record, too.
 # add hidden columns in tvSitings for CheckpointID and ParticipantID
 # Create the edit siting window and function
-# 
+# Is it possible to hide a CheckpointID in the cmbCheckpoint element?
+#
+# Start clean NOW with a fresh database. Make sure all the functions work in the new structure
 
