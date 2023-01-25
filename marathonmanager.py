@@ -195,29 +195,6 @@ def create_database(db_name: str = None) -> bool:
     CONN.commit()
 
 
-
-# def create_settings_database(db_name: str = None) -> bool:
-#     sStmt = "CREATE TABLE IF NOT EXISTS Settings (SettingID INTEGER UNIQUE, SettingName TEXT, SettingValue TEXT, PRIMARY KEY(SettingID AUTOINCREMENT))"
-#     CUR.execute(sStmt)
-
-#     sStmt = "CREATE TABLE IF NOT EXISTS Recents (RecentID INTEGER UNIQUE,	EventName TEXT,	DBPath TEXT, PRIMARY KEY(RecentID AUTOINCREMENT))"
-#     CUR.execute(sStmt)
-
-#     # Add the settings fields
-#     # sStmt = 'INSERT INTO Settings (SettingName, SettingValue) VALUES ("DBVersion","1")'
-#     CUR.execute("""INSERT INTO Settings (SettingName, SettingValue) VALUES ('DBVersion','1')""")
-#     CONN.commit()
-
-#     # Local Users Table
-#     sStmt = "CREATE TABLE IF NOT EXISTS LocalUsers (UserID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"
-#     CUR.execute(sStmt)
-
-#     # Add a local admin user
-#     sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
-#     CUR.execute(sStmt)
-#     CONN.commit()
-
-
 # =============================================================================
 # GUI Definitions
 #
@@ -249,6 +226,7 @@ def quick_links(main_frame: tk.Frame) -> tk.Frame:
 def siting_window(main_frame: tk.Frame) -> tk.Frame:
     cn,cur = None,None
     checkpoints = []
+    after_id = ''
 
     def sitings_filldata(tv:ttk.Treeview):
         for item in tv.get_children():
@@ -340,11 +318,13 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
     def update_clock():
         """Update the clock every second."""
+        global after_id
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
 
         lblTime.configure(text=current_time)
-        main_frame.after(1000,update_clock)
+        after_id = main_frame.after(1000,update_clock)
+        x =x 
 
     def sitings_edit_row(event):
         item = tvSitings.item(tvSitings.focus(),"values")
@@ -374,24 +354,25 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
     lblStatus.grid(row=1,column=0,columnspan=4,sticky='we',padx=5)
 
     tvSitings = ttk.Treeview(main_frame,column=("c1","c2","c3","c4"),show='headings',selectmode='browse')
-    tvSitings.column("#1",anchor='w',minwidth=30,width=60,stretch='no')
+    tvSitings.column("#1",anchor='w',minwidth=0,width=0,stretch='no')
     tvSitings.heading("#1",text="ID",anchor='w')
-    tvSitings.column("#2",anchor='w',minwidth=30,width=110,stretch='no')
+    tvSitings.column("#2",anchor='w',minwidth=30,width=160,stretch='no')
     tvSitings.heading("#2",text="Time",anchor='w')
     tvSitings.column("#3",anchor='w',minwidth=30,width=100,stretch='no')
     tvSitings.heading("#3",text="Checkpoint",anchor='w')
-    tvSitings.column("#4",anchor='w',minwidth=30,width=240,stretch='no')
+    tvSitings.column("#4",anchor='w',minwidth=30,width=290,stretch='no')
     tvSitings.heading("#4",text="Participant",anchor='w')
     tvSitings.grid(row=2,column=0,columnspan=4,padx=5,pady=15)
     tvSitings.bind("<Double-1>",sitings_edit_row)
 
     yscrollbar = ttk.Scrollbar(main_frame,orient='vertical',command=tvSitings.yview)
-    yscrollbar.grid(row=2, column=5, sticky='nse')
+    yscrollbar.grid(row=2, column=5,pady=15,sticky='nse')
     yscrollbar.configure(command=tvSitings.yview)    
     tvSitings.configure(yscrollcommand=yscrollbar.set)
 
     sitings_filldata(tvSitings)
-    
+
+    main_frame.protocol("WM_DELETE_WINDOW",on_closing)
 
     update_clock()
 
@@ -977,7 +958,7 @@ def main():
     def open_sitings():
         sitings = tk.Tk()
         sitings.title("MM: Sitings")
-        sitings.geometry('550x320')
+        sitings.geometry('600x320')
         sw = siting_window(sitings)
         # sitings.grid(row=0,column=1,sticky='n')
 
