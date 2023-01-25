@@ -434,28 +434,28 @@ def event_window(main_frame: tk.Frame) -> tk.Frame:
     imgLogo = ttk.Label(main_frame,text="logo placeholder")
     imgLogo.grid(row=0,column=0,rowspan=5)
 
-    lblEventName = ttk.Label(main_frame,text='Event Name:',width=10)
-    lblEventName.grid(row=0,column=1,sticky='w', padx=5, pady=8)
+    lblEventName = ttk.Label(main_frame,text='Event Name:',width=12)
+    lblEventName.grid(row=0,column=1,sticky='e', padx=5, pady=8)
     txtEventName = ttk.Entry(main_frame,width=25)
-    txtEventName.grid(row=0,column=2, columnspan=2)
+    txtEventName.grid(row=0,column=2, columnspan=2,sticky='w')
     
-    lblDescription = ttk.Label(main_frame,text='Description:',width=10)
-    lblDescription.grid(row=1,column=1)
+    lblDescription = ttk.Label(main_frame,text='Description:',width=12)
+    lblDescription.grid(row=1,column=1,sticky='e',padx=5, pady=8)
     txtDescription = tk.Entry(main_frame,width=25)
-    txtDescription.grid(row=1,column=2, columnspan=2)
+    txtDescription.grid(row=1,column=2, columnspan=2,sticky='w',padx=5, pady=8)
 
-    lblLocation = ttk.Label(main_frame,text='Location:',width=10)
-    lblLocation.grid(row=2,column=1)
+    lblLocation = ttk.Label(main_frame,text='Location:',width=12)
+    lblLocation.grid(row=2,column=1,sticky='e')
     txtLocation = tk.Entry(main_frame,width=10)
     txtLocation.grid(row=2,column=2,sticky='w')
 
-    lblStartDate = ttk.Label(main_frame,text='Start Date:',width=10)
-    lblStartDate.grid(row=3,column=1)
+    lblStartDate = ttk.Label(main_frame,text='Start Date:',width=12)
+    lblStartDate.grid(row=3,column=1,sticky='e')
     txtStartDate = tk.Entry(main_frame,width=10)
     txtStartDate.grid(row=3,column=2,sticky='w')
 
-    lblStartTime = ttk.Label(main_frame,text='Start Time:',width=10)
-    lblStartTime.grid(row=4,column=1)
+    lblStartTime = ttk.Label(main_frame,text='Start Time:',width=12)
+    lblStartTime.grid(row=4,column=1,sticky='e')
     txtStartTime = tk.Entry(main_frame,width=10)
     txtStartTime.grid(row=4,column=2,sticky='w')
 
@@ -881,7 +881,7 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     def event_click():
         e_root = tk.Tk()
         e_root.title("MM: Event")
-        e_root.geometry('500x150')
+        e_root.geometry('350x150')
         ew = event_window(e_root)
 
     def checkpoints_click():
@@ -947,18 +947,11 @@ def initialize():
 
     CONN = sqlite3.connect(DB_NAME)
     CUR = CONN.cursor()
-    # stmt = "ATTACH DATABASE '" + DB_NAME_SETTINGS + "' AS mmSettings;"
-    # CUR.execute(stmt)
-    # CONN.commit()
 
-    # res = CUR.execute("""SELECT SettingValue from mmSettings.Settings WHERE SettingName = 'DBVersion'""")
-    # res = CUR.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
-    res = CUR.execute("""SELECT * from Settings;""")
-    for x in res:
-        print(x)
-    print(list(res))
-    # db_version = int(list(res)[0][0])
-    db_version = 1
+    res = CUR.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
+    # reslst = list(res)
+    db_version = int(list(res)[0][0])
+    # db_version = 1
     if db_version < 1:
         print("Database is an older (incompatible) version. Update.")
         exit()
@@ -1055,5 +1048,5 @@ if __name__ == "__main__":
 # Create the edit siting window and function
 # Is it possible to hide a CheckpointID in the cmbCheckpoint element?
 #
-# Start clean NOW with a fresh database. Make sure all the functions work in the new structure
+# need to make sure tick (and quotes?) are not used in queries.
 
