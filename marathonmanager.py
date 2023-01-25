@@ -23,7 +23,7 @@ from datetime import datetime
 
 # =============================================================================
 # Constants
-DB_NAME = 'mm_test.db'
+DB_NAME = 'mm_test2.db'
 DB_NAME_SETTINGS = 'mmsettings.db'
 CONN = None
 CUR = None
@@ -45,9 +45,9 @@ def create_database(db_name: str = None) -> bool:
     global CONN
     global CUR
 
-    # Users Table
-    sStmt = """CREATE TABLE Users (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"""
-    CUR.execute(sStmt)
+    # # Users Table
+    # sStmt = """CREATE TABLE Users (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"""
+    # CUR.execute(sStmt)
 
     # Volunteers Table
     sStmt = """CREATE TABLE IF NOT EXISTS Volunteers (
@@ -67,18 +67,22 @@ def create_database(db_name: str = None) -> bool:
             EContactName TEXT, 
             EContactPhone TEXT, 
             Callsign TEXT, 
-            PRIMARY KEY(PersonID AUTOINCREMENT)
+            Username TEXT,
+            Password TEXT,
+            Permission INTEGER,
+            PRIMARY KEY(VolunteerID AUTOINCREMENT)
             );"""
     CUR.execute(sStmt)
 
     # Volunteer Log Table (history of assignments, check-ins and -outs)
     sStmt = """CREATE TABLE VolLog (
-            VolunteerID	INTEGER UNIQUE,
+            LogID	INTEGER UNIQUE,
+            VolunteerID INTEGER,
             EventID	INTEGER,
             Assignment	TEXT,
             Checkin	TEXT,
             Checkout	TEXT,
-            PRIMARY KEY(VolunteerID AUTOINCREMENT)
+            PRIMARY KEY(LogID AUTOINCREMENT)
         )"""
     CUR.execute(sStmt)
 
@@ -102,7 +106,7 @@ def create_database(db_name: str = None) -> bool:
             EventID	INTEGER,
             RaceID	INTEGER,
             Bib	INTEGER,
-            PRIMARY KEY(PersonID AUTOINCREMENT)
+            PRIMARY KEY(ParticipantID AUTOINCREMENT)
         )"""
     CUR.execute(sStmt)
 
@@ -127,7 +131,7 @@ def create_database(db_name: str = None) -> bool:
             Distance	TEXT,
             Color	TEXT,
             Path    TEXT,
-            PRIMARY KEY(RaceID AUTOINCREMENT)
+            PRIMARY KEY(CourseID AUTOINCREMENT)
         );"""
     CUR.execute(sStmt)
 
@@ -160,6 +164,7 @@ def create_database(db_name: str = None) -> bool:
             EventID	INTEGER,
             Logtime	TEXT,
             Message	TEXT,
+            Source TEXT,
             AssignedTo	TEXT,
             CompletedTime	TEXT,
             Status	TEXT,
@@ -169,12 +174,10 @@ def create_database(db_name: str = None) -> bool:
 
     CONN.commit()
 
-
-def create_settings_database(db_name: str = None) -> bool:
     sStmt = "CREATE TABLE IF NOT EXISTS Settings (SettingID INTEGER UNIQUE, SettingName TEXT, SettingValue TEXT, PRIMARY KEY(SettingID AUTOINCREMENT))"
     CUR.execute(sStmt)
 
-    sStmt = "CREATE TABLE IF NOT EXISTS Recents (RecentID INTEGER UNIQUE,	EventName TEXT,	DBPath TEXT, PRIMARY KEY(RecentID AUTOINCREMENT))"
+    sStmt = "CREATE TABLE IF NOT EXISTS Recents (RecentID INTEGER UNIQUE, EventName TEXT, DBPath TEXT, PRIMARY KEY(RecentID AUTOINCREMENT))"
     CUR.execute(sStmt)
 
     # Add the settings fields
@@ -190,6 +193,29 @@ def create_settings_database(db_name: str = None) -> bool:
     sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
     CUR.execute(sStmt)
     CONN.commit()
+
+
+
+# def create_settings_database(db_name: str = None) -> bool:
+#     sStmt = "CREATE TABLE IF NOT EXISTS Settings (SettingID INTEGER UNIQUE, SettingName TEXT, SettingValue TEXT, PRIMARY KEY(SettingID AUTOINCREMENT))"
+#     CUR.execute(sStmt)
+
+#     sStmt = "CREATE TABLE IF NOT EXISTS Recents (RecentID INTEGER UNIQUE,	EventName TEXT,	DBPath TEXT, PRIMARY KEY(RecentID AUTOINCREMENT))"
+#     CUR.execute(sStmt)
+
+#     # Add the settings fields
+#     # sStmt = 'INSERT INTO Settings (SettingName, SettingValue) VALUES ("DBVersion","1")'
+#     CUR.execute("""INSERT INTO Settings (SettingName, SettingValue) VALUES ('DBVersion','1')""")
+#     CONN.commit()
+
+#     # Local Users Table
+#     sStmt = "CREATE TABLE IF NOT EXISTS LocalUsers (UserID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"
+#     CUR.execute(sStmt)
+
+#     # Add a local admin user
+#     sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
+#     CUR.execute(sStmt)
+#     CONN.commit()
 
 
 # =============================================================================
@@ -230,7 +256,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         
         cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
-        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.Bib || ' ' || pe.Firstname || ' ' || pe.Lastname from Sitings as s, Checkpoints as c, Participants as pa, Persons as pe where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID and pa.PersonID=pe.PersonID order by s.SitingTime DESC;")
+        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.Bib || ' ' || pa.Firstname || ' ' || pa.Lastname from Sitings as s, Checkpoints as c, Participants as pa where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID order by s.SitingTime DESC;")
         rows = cur.fetchall()
 
         for row in rows:
@@ -290,7 +316,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
                 res = list(cur.execute(stmt))
                 if len(res) == 0:
                     # add the bib to Participants
-                    stmt = "insert into Participants (EventID,RaceID,Bib) values (1,0," + b + ");"
+                    stmt = "insert into Participants (EventID,Firstname,Lastname,RaceID,Bib) values (1,'','',0," + b + ");"
                 cur.execute(stmt)
                 cn.commit()
 
@@ -906,12 +932,12 @@ def initialize():
     global CUR
     
     # open the database
-    # TODO: this needs to be modified to check for valid fields (a db version?)
-    if not database_exists(DB_NAME_SETTINGS):
-        CONN = sqlite3.connect(DB_NAME_SETTINGS)
-        CUR = CONN.cursor()
-        create_settings_database()
-        CONN.close()
+    # # TODO: this needs to be modified to check for valid fields (a db version?)
+    # if not database_exists(DB_NAME_SETTINGS):
+    #     CONN = sqlite3.connect(DB_NAME_SETTINGS)
+    #     CUR = CONN.cursor()
+    #     create_settings_database()
+    #     CONN.close()
 
     if not database_exists(DB_NAME):
         CONN = sqlite3.connect(DB_NAME)
@@ -921,12 +947,18 @@ def initialize():
 
     CONN = sqlite3.connect(DB_NAME)
     CUR = CONN.cursor()
-    stmt = "ATTACH DATABASE '" + DB_NAME_SETTINGS + "' AS mmSettings;"
-    CUR.execute(stmt)
-    CONN.commit()
+    # stmt = "ATTACH DATABASE '" + DB_NAME_SETTINGS + "' AS mmSettings;"
+    # CUR.execute(stmt)
+    # CONN.commit()
 
-    res = CUR.execute("""SELECT SettingValue from mmSettings.Settings WHERE SettingName = 'DBVersion'""")
-    db_version = int(list(res)[0][0])
+    # res = CUR.execute("""SELECT SettingValue from mmSettings.Settings WHERE SettingName = 'DBVersion'""")
+    # res = CUR.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
+    res = CUR.execute("""SELECT * from Settings;""")
+    for x in res:
+        print(x)
+    print(list(res))
+    # db_version = int(list(res)[0][0])
+    db_version = 1
     if db_version < 1:
         print("Database is an older (incompatible) version. Update.")
         exit()
@@ -938,6 +970,9 @@ def initialize():
 # Main
 # 
 def main():
+
+    initialize()
+
     root = tk.Tk()
     main_frame = ttk.Frame(root)
     main_frame.pack(fill='both',expand=True)
