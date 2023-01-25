@@ -15,6 +15,7 @@ from pathlib import Path
 # from tkinter import Tk
 from tkinter import ttk
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import colorchooser
 import re
 from datetime import datetime
@@ -234,7 +235,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         
         cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
-        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.Bib || ' ' || pa.Firstname || ' ' || pa.Lastname from Sitings as s, Checkpoints as c, Participants as pa where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID order by s.SitingTime DESC;")
+        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.ParticipantID,pa.Bib || ' ' || pa.Firstname || ' ' || pa.Lastname from Sitings as s, Checkpoints as c, Participants as pa where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID order by s.SitingTime DESC;")
         rows = cur.fetchall()
 
         for row in rows:
@@ -323,12 +324,24 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         current_time = now.strftime("%H:%M:%S")
 
         lblTime.configure(text=current_time)
+        # TODO: after() returns an id, but the id changes with each call.
+        # I need to keep the id so the after() call can be cancelled when the 
+        # window is destroyed.
         after_id = main_frame.after(1000,update_clock)
-        x =x 
+
+    def on_closing():
+        # called when the window closes.
+        # Ideally, this would cancel the last after() call. [doesn't work]
+
+        # main_frame.after_cancel(after_id)
+        main_frame.destroy()
+        return
 
     def sitings_edit_row(event):
         item = tvSitings.item(tvSitings.focus(),"values")
+        sid,timestamp,cp,pid,participant = tvSitings.item(tvSitings.focus(),"values")
         print(item)
+        messagebox.showinfo(title="MM: Info",message="Edit not yet implemented.",parent=main_frame)
 
 
     # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
@@ -353,15 +366,17 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
     lblStatus = ttk.Label(main_frame,text='this is where the status goes', relief="sunken")
     lblStatus.grid(row=1,column=0,columnspan=4,sticky='we',padx=5)
 
-    tvSitings = ttk.Treeview(main_frame,column=("c1","c2","c3","c4"),show='headings',selectmode='browse')
-    tvSitings.column("#1",anchor='w',minwidth=0,width=0,stretch='no')
-    tvSitings.heading("#1",text="ID",anchor='w')
-    tvSitings.column("#2",anchor='w',minwidth=30,width=160,stretch='no')
-    tvSitings.heading("#2",text="Time",anchor='w')
-    tvSitings.column("#3",anchor='w',minwidth=30,width=100,stretch='no')
-    tvSitings.heading("#3",text="Checkpoint",anchor='w')
-    tvSitings.column("#4",anchor='w',minwidth=30,width=290,stretch='no')
-    tvSitings.heading("#4",text="Participant",anchor='w')
+    tvSitings = ttk.Treeview(main_frame,column=("sid","time","cp","pid","part"),show='headings',selectmode='browse')
+    tvSitings.column("sid",anchor='w',minwidth=0,width=0,stretch='no')  # hidden
+    tvSitings.heading("sid",text="SID",anchor='w')
+    tvSitings.column("time",anchor='w',minwidth=30,width=160,stretch='no')
+    tvSitings.heading("time",text="Time",anchor='w')
+    tvSitings.column("cp",anchor='w',minwidth=30,width=100,stretch='no')
+    tvSitings.heading("cp",text="Checkpoint",anchor='w')
+    tvSitings.column("pid",anchor='w',minwidth=0,width=0,stretch='no')  # hidden
+    tvSitings.heading("pid",text="PID",anchor='w')
+    tvSitings.column("part",anchor='w',minwidth=30,width=290,stretch='no')
+    tvSitings.heading("part",text="Participant",anchor='w')
     tvSitings.grid(row=2,column=0,columnspan=4,padx=5,pady=15)
     tvSitings.bind("<Double-1>",sitings_edit_row)
 
