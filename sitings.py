@@ -1,7 +1,12 @@
-import random
+# Marathon Manager
+#
+# Sitings Functions
+#
+
+
+
 import sqlite3
 from pathlib import Path
-# from tkinter import Tk
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
@@ -154,7 +159,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
     butSubmit = ttk.Button(main_frame,text='Submit',width=10,command=submit_bibs)
     butSubmit.grid(row=0,column=3,sticky='W',  padx=5, pady=8)
 
-    lblStatus = ttk.Label(main_frame,text='this is where the status goes', relief="sunken")
+    lblStatus = ttk.Label(main_frame,text=' ', relief="sunken")
     lblStatus.grid(row=1,column=0,columnspan=4,sticky='we',padx=5)
 
     tvSitings = ttk.Treeview(main_frame,column=("sid","time","cp","pid","part"),show='headings',selectmode='browse')
