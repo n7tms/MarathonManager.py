@@ -169,7 +169,18 @@ def courses_window(main_frame:tk.Frame) -> tk.Frame:
     tvCourses.heading("#5",text="Path")
     tvCourses.grid(row=2,column=0,columnspan=3,padx=5,pady=5)
     tvCourses.bind("<Double-1>",courses_edit_row)
+
+    yscrollbar = ttk.Scrollbar(main_frame,orient='vertical',command=tvCourses.yview)
+    yscrollbar.grid(row=2, column=3,pady=15,sticky='nse')
+    yscrollbar.configure(command=tvCourses.yview)    
+    tvCourses.configure(yscrollcommand=yscrollbar.set)
+
+    xscrollbar = ttk.Scrollbar(main_frame,orient='horizontal',command=tvCourses.xview)
+    xscrollbar.grid(row=3, column=0,columnspan=3,pady=5,padx=5,sticky='ew')
+    xscrollbar.configure(command=tvCourses.xview)    
+    tvCourses.configure(xscrollcommand=xscrollbar.set)
+
     courses_filldata(tvCourses)
 
     btnClose = ttk.Button(main_frame,text="Close",command=courses_close)
-    btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
+    btnClose.grid(row=4,column=2,padx=5,pady=5,sticky='w')

@@ -149,7 +149,7 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     def courses_click():
         root = tk.Tk()
         root.title("MM: Courses")
-        root.geometry('825x340')
+        root.geometry('735x380')
         ew = courses_window(root)
 
 
