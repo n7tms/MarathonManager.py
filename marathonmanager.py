@@ -12,7 +12,6 @@
 import random
 import sqlite3
 from pathlib import Path
-# from tkinter import Tk
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox

@@ -6,6 +6,7 @@
 - Is it possible to hide a CheckpointID in the cmbCheckpoint element?
 
 - need to make sure tick (and quotes?) are not used in queries.
+- add horizontal and vertical scrollbars on the courses window
 
 
 
