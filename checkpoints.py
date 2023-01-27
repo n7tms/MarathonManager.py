@@ -22,16 +22,16 @@ def checkpoint_filldata(tv:ttk.Treeview) -> None:
     # get the checkpoints from the database
     cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
-    cur.execute("select CheckpointID, CPName, Description, 'somewhere' from Checkpoints;")
+    cur.execute("select CheckpointID, CPName, Description, Longitude, Latitude from Checkpoints;")
     rows = cur.fetchall()
     for row in rows:
         tv.insert("",tk.END,values=row)
 
 def checkpoint_edit(checkpoint,tv):
     if checkpoint:
-        cpid,cname,cdescription,clocation = checkpoint
+        cpid,cname,cdescription,clong,clat = checkpoint
     else:
-        cpid,cname,cdescription,clocation = '','','',''
+        cpid,cname,cdescription,clong,clat = '','','','',''
 
     def cancel():
         croot.destroy()
@@ -44,8 +44,9 @@ def checkpoint_edit(checkpoint,tv):
         cpid = txtCPID.get()
         cname=txtName.get()
         cdescription = txtDescr.get()
-        clocation = txtLoc.get()
-        cur.execute("insert into Checkpoints (CPName, Description) values(?,?);",[cname,cdescription])
+        clong = txtLong.get()
+        clat = txtLat.get()
+        cur.execute("insert into Checkpoints (CPName, Description, Longitude, Latitude) values(?,?,?,?);",[cname,cdescription,clong,clat])
         cn.commit()
 
         checkpoint_filldata(tv)
@@ -59,8 +60,9 @@ def checkpoint_edit(checkpoint,tv):
         cpid = txtCPID.get()
         cname=txtName.get()
         cdescription = txtDescr.get()
-        clocation = txtLoc.get()
-        cur.execute("update Checkpoints set CPName=?, Description=? where CheckpointID=?",[cname,cdescription,cpid])
+        clong = txtLong.get()
+        clat = txtLat.get()
+        cur.execute("update Checkpoints set CPName=?, Description=?, Longitude=?, Latitude=? where CheckpointID=?",[cname,cdescription,clong,clat,cpid])
         cn.commit()
 
         checkpoint_filldata(tv)
@@ -89,21 +91,27 @@ def checkpoint_edit(checkpoint,tv):
     txtDescr.grid(row=2,column=1,columnspan=2,sticky='w')
     txtDescr.insert(0,cdescription)
 
-    lblLoc = ttk.Label(croot,text="Location:")
-    lblLoc.grid(row=3,column=0,sticky='e')
-    txtLoc = ttk.Entry(croot)
-    txtLoc.grid(row=3,column=1,columnspan=2,sticky='w')
-    txtLoc.insert(0,clocation)
+    lblLong = ttk.Label(croot,text="Longitude:")
+    lblLong.grid(row=3,column=0,sticky='e')
+    txtLong = ttk.Entry(croot)
+    txtLong.grid(row=3,column=1,columnspan=2,sticky='w')
+    txtLong.insert(0,clong)
+
+    lblLat = ttk.Label(croot,text="Latitude:")
+    lblLat.grid(row=4,column=0,sticky='e')
+    txtLat = ttk.Entry(croot)
+    txtLat.grid(row=4,column=1,columnspan=2,sticky='w')
+    txtLat.insert(0,clat)
+
 
     if checkpoint:
         butSave = ttk.Button(croot,text="Update",command=update)
-        butSave.grid(row=4,column=1,sticky='e')
     else:
         butSave = ttk.Button(croot,text="Save",command=save)
-        butSave.grid(row=4,column=1,sticky='e')
+    butSave.grid(row=5,column=1,sticky='e')
 
     butCancel = ttk.Button(croot,text="Cancel",command=cancel)
-    butCancel.grid(row=4,column=2,sticky='w')
+    butCancel.grid(row=5,column=2,sticky='w')
 
 
 
@@ -139,17 +147,26 @@ def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
     btnMap = ttk.Button(main_frame,text="Map Checkpoints",command=checkpoint_map)
     btnMap.grid(row=1,column=1,padx=5,pady=5,sticky='w')
 
-    tvCheckpoints = ttk.Treeview(main_frame,column=("c1","c2","c3","c4"),show='headings',selectmode='browse')
-    tvCheckpoints.column("#1",anchor='center')
+    tvCheckpoints = ttk.Treeview(main_frame,column=("c1","c2","c3","c4","c5"),show='headings',selectmode='browse')
+    tvCheckpoints.column("#1",anchor='center',minwidth=0,width=0)   # hidden
     tvCheckpoints.heading("#1",text="CP ID")
-    tvCheckpoints.column("#2",anchor='w')
-    tvCheckpoints.heading("#2",text="Checkpoint")
-    tvCheckpoints.column("#3",anchor='w')
-    tvCheckpoints.heading("#3",text="Description")
-    tvCheckpoints.column("#4",anchor='w')
-    tvCheckpoints.heading("#4",text="Location")
+    tvCheckpoints.column("#2",anchor='w',minwidth=0,width=100)
+    tvCheckpoints.heading("#2",text="Checkpoint",anchor='w')
+    tvCheckpoints.column("#3",anchor='w',minwidth=0,width=200)
+    tvCheckpoints.heading("#3",text="Description",anchor='w')
+    tvCheckpoints.column("#4",anchor='w',minwidth=0,width=150)
+    tvCheckpoints.heading("#4",text="Longitude",anchor='w')
+    tvCheckpoints.column("#5",anchor='w',minwidth=0,width=150)
+    tvCheckpoints.heading("#5",text="Latitude",anchor='w')
     tvCheckpoints.grid(row=2,column=0,columnspan=3,padx=5,pady=5)
     tvCheckpoints.bind("<Double-1>",checkpoint_edit_row)
+
+    yscrollbar = ttk.Scrollbar(main_frame,orient='vertical',command=tvCheckpoints.yview)
+    yscrollbar.grid(row=2, column=3,pady=15,sticky='nse')
+    yscrollbar.configure(command=tvCheckpoints.yview)    
+    tvCheckpoints.configure(yscrollcommand=yscrollbar.set)
+
+
     checkpoint_filldata(tvCheckpoints)
 
     btnClose = ttk.Button(main_frame,text="Close",command=checkpoint_close)

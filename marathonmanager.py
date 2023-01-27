@@ -143,7 +143,7 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     def checkpoints_click():
         root = tk.Tk()
         root.title("MM: Checkpoints")
-        root.geometry('825x340')
+        root.geometry('700x340')
         ew = checkpoint_window(root)
 
     def courses_click():

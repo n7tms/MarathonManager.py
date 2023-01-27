@@ -2,11 +2,29 @@
 
 ## TODO
 - [ ] Create the edit siting window and function
-- [ ] Is it possible to hide a CheckpointID in the cmbCheckpoint element?
-
 - [ ] need to make sure tick (and quotes?) are not used in queries.
-- [ ] add horizontal and vertical scrollbars on the courses window
 
+- [ ] add horizontal and vertical scrollbars on the courses window
+- [ ] Add a participant
+- [ ] Import participants (uses add fn)
+- [ ] Add volunteer
+- [ ] Import vol from csv 
+- [ ] Import vol from other db
+- [ ] Export vol to csv/db file
+- [ ] Assign vol to (something)
+- [ ] Create custom assignment (something)
+- [ ] Auto add/remove checkpoints to assignment options
+- [ ] List assignments
+- [ ] Change assignments
+- [ ] Record traffic
+- [ ] Mark traffic complete
+- [ ] Reports (see list below)
+- [ ] Modify participant table to handle teams (relay)
+- [ ] Map checkpoints
+- [ ] Map runners
+
+- [x] Modify checkpoint code to deal with actual location
+- [x] Is it possible to hide a CheckpointID in the cmbCheckpoint element?
 
 
 
