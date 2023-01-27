@@ -2,7 +2,6 @@
 ***
 
 ## TODO
-- add hidden columns in tvSitings for CheckpointID and ParticipantID
 - Create the edit siting window and function
 - Is it possible to hide a CheckpointID in the cmbCheckpoint element?
 

@@ -22,7 +22,7 @@ from constants import *
 
 def siting_window(main_frame: tk.Frame) -> tk.Frame:
     cn,cur = None,None
-    checkpoints = []
+    checkpoints = {}
     after_id = ''
 
     def sitings_filldata(tv:ttk.Treeview):
@@ -44,12 +44,10 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
         res = cur.execute("select CheckpointID,CPName from Checkpoints")
         for x in res:
-            checkpoints.append(x)
+            checkpoints[x[1]] = x[0]
         
-        cps = []
-        for x in checkpoints:
-            cps.append(x[1])
-        return cps
+        return list(checkpoints.keys()) 
+
 
     def bib_enterkey(event):
         """Check if the Enter key was pressed from inside the bib text field"""
@@ -73,19 +71,24 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
             # Get the checkpoint ID
             cid = -1
-            for c in checkpoints:
-                if c[1] == cmbCheckpoint.get():
-                    cid = c[0]
-                    break
-            if cid < 0:
+            # for c in checkpoints:
+            #     if c[1] == cmbCheckpoint.get():
+            #         cid = c[0]
+            #         break
+            # if cid < 0:
+            #     raise "Sitings: Checkpoint not found."
+            
+            if cmbCheckpoint.get() not in checkpoints:
                 raise "Sitings: Checkpoint not found."
+            else:
+                cid = checkpoints[cmbCheckpoint.get()]
             
             # remove duplicate bibs (raise an error?)
             bibs = list(set(bibs))
             
             # iterate through the list of bibs
             for b in bibs:
-                # check if it exists in the database; add it if it doesn't
+                # check if bib exists in the database; add it if it doesn't
                 partID = -1
                 stmt = "select ParticipantID from Participants where Bib=" + b + ";"
                 res = list(cur.execute(stmt))
@@ -150,7 +153,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
     cmbCheckpoint = ttk.Combobox(main_frame,width=10,values=get_checkpoints())
     cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
-    cmbCheckpoint.set(checkpoints[0][1])
+    cmbCheckpoint.set(list(checkpoints.keys())[0])
 
     txtBibs = ttk.Entry(main_frame,width=30)
     txtBibs.grid(row=0,column=2,sticky='W',  padx=5, pady=8)
