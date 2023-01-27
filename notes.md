@@ -4,7 +4,7 @@
 - [ ] Create the edit siting window and function
 - [ ] need to make sure tick (and quotes?) are not used in queries.
 
-- [ ] add horizontal and vertical scrollbars on the courses window
+- [x] add horizontal and vertical scrollbars on the courses window
 - [ ] Add a participant
 - [ ] Import participants (uses add fn)
 - [ ] Add volunteer

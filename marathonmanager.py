@@ -26,6 +26,7 @@ from courses import *
 from database import *
 from events import *
 from sitings import *
+from participants import *
 
 
 
@@ -152,6 +153,12 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
         root.geometry('735x380')
         ew = courses_window(root)
 
+    def participants_click():
+        root = tk.Tk()
+        root.title("MM: Participants")
+        root.geometry('800x600')
+        pw = participant_window(root)
+
 
     filemenu = tk.Menu(mmb, tearoff=0)
     filemenu.add_command(label="New", command=donothing)
@@ -168,7 +175,7 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     eventmenu.add_command(label="Checkpoints", command=checkpoints_click)
     eventmenu.add_command(label="Courses", command=courses_click)
     eventmenu.add_separator()
-    eventmenu.add_command(label="Participants", command=donothing)
+    eventmenu.add_command(label="Participants", command=participants_click)
     mmb.add_cascade(label="Event", menu=eventmenu)
 
     helpmenu = tk.Menu(mmb, tearoff=0)
@@ -243,6 +250,13 @@ def main():
         root.geometry('825x340')
         ew = checkpoint_window(root)
 
+    def open_participants():
+        root = tk.Tk()
+        root.title("MM: Participants")
+        root.geometry('800x600')
+        pw = participant_window(root)
+
+
     def open_log():
         pass
 
@@ -255,6 +269,9 @@ def main():
 
     btnSitings = ttk.Button(main_frame,text="Sitings",command=open_sitings)
     btnSitings.grid(row=1,column=0,padx=10,pady=10,sticky='news')
+
+    btnParticipants = ttk.Button(main_frame,text="Participants",command=open_participants)
+    btnParticipants.grid(row=2,column=0,padx=10,pady=10,sticky='news')
 
     
     # # Reports/Status
