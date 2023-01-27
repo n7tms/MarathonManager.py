@@ -22,7 +22,9 @@ def participants_filldata(tv:ttk.Treeview) -> None:
     # get the checkpoints from the database
     cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
-    cur.execute("select ParticipantID, Lastname || ', ' || Firstname as Name, c.CourseID, CourseName, Bib from Participants as p, Courses as c where p.CourseID=c.CourseID;")
+
+    # This SQL statement retrieves all of the participants regardless if a courseid has been assigned.
+    cur.execute("select ParticipantID, Lastname || ', ' || Firstname as Name, c.CourseID, CourseName, Bib from Participants as p LEFT JOIN Courses as c ON p.CourseID=c.CourseID;")
     rows = cur.fetchall()
     for row in rows:
         tv.insert("",tk.END,values=row)
@@ -31,6 +33,8 @@ def participants_filldata(tv:ttk.Treeview) -> None:
 def participant_edit(pid=None,tv=None):
     cn = sqlite3.connect(DB_NAME)
     cur = cn.cursor()
+    textable_var = tk.StringVar()
+    gender_var = tk.StringVar()
 
     if pid:
         cur.execute("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, CourseID, Bib from Participants where ParticipantID=?",[pid])
@@ -48,20 +52,33 @@ def participant_edit(pid=None,tv=None):
 
     def save():
         """Create/insert a new participant"""
+        cn = sqlite3.connect(DB_NAME)
+        cur = cn.cursor()
 
-        # cpid = txtCPID.get()
-        # cname=txtName.get()
-        # cdescription = txtDescr.get()
-        # clong = txtLong.get()
-        # clat = txtLat.get()
-        # cur.execute("""insert into Participants (Firstname, Lastname, Gender, Birthdate, Phone, 
-        # Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, 
-        # CourseID, Bib) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""",[])
-        # cn.commit()
+        fname = txtFName.get()
+        lname = txtLName.get()
+        gender = gender_var.get()
+        bday = txtBday.get()
+        phone = txtPhone.get()
+        textable = int(textable_var.get())
+        email = txtEmail.get()
+        street1 = txtStreet1.get()
+        street2 = txtStreet2.get()
+        city = txtCity.get()
+        state = txtState.get()
+        zipcode = txtZip.get()
+        ename = txtEname.get()
+        ephone = txtEphone.get()
+        cid = txtCID.get()
+        bib = txtBib.get()
 
-        # participants_filldata(tv)
-        # croot.destroy()
-        pass
+        cur.execute("""insert into Participants (Firstname, Lastname, Gender, Birthdate, Phone, 
+        Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, 
+        CourseID, Bib) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""",[fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib])
+        cn.commit()
+
+        participants_filldata(tv)
+        croot.destroy()
 
     def update():
         """Update an existing Checkpoint"""
@@ -102,7 +119,8 @@ def participant_edit(pid=None,tv=None):
     lblPID.grid(row=0,column=0,sticky='e')
     txtPID = ttk.Entry(croot)
     txtPID.grid(row=0,column=1,columnspan=2,sticky='w')
-    txtPID.insert(0,pid)
+    if pid:
+        txtPID.insert(0,pid)
     txtPID.config(state="disabled")
 
     lblFName = ttk.Label(croot,text="Firstname:")
@@ -117,14 +135,17 @@ def participant_edit(pid=None,tv=None):
     txtLName.grid(row=1,column=4,columnspan=2,sticky='w')
     txtLName.insert(0,lname)
 
-    gender_var = tk.StringVar()
-    gender_f = ttk.Radiobutton(croot, text='Female',variable=gender_var, value="F")
-    gender_m = ttk.Radiobutton(croot, text='Male',variable=gender_var, value="M")
-    gender_o = ttk.Radiobutton(croot, text='Other',variable=gender_var, value="O")
+    def gender_selected():
+        tk.messagebox.showinfo(title="Gender",message=gender_var.get())
+    
+    gender_f = tk.Radiobutton(croot, text='Female',variable=gender_var, value='F')
+    gender_m = tk.Radiobutton(croot, text='Male',variable=gender_var, value='M')
+    gender_o = tk.Radiobutton(croot, text='Other',variable=gender_var, value='O')
     gender_f.grid(row=2,column=0,sticky='w')
     gender_m.grid(row=2,column=1,sticky='w')
     gender_o.grid(row=2,column=2,sticky='w')
-    gender_var.set(gender)
+    # gender_var.set(gender)
+    gender_f.invoke()
 
     lblBday = ttk.Label(croot,text="Birthdate:")
     lblBday.grid(row=3,column=0,sticky='e')
@@ -140,8 +161,7 @@ def participant_edit(pid=None,tv=None):
     if phone:
         txtPhone.insert(0,phone)
 
-    textable_var = tk.StringVar()
-    chkTextable = ttk.Checkbutton(croot,text="Texable",variable=textable_var,onvalue="1",offvalue="0")
+    chkTextable = tk.Checkbutton(croot,text="Texable",variable=textable_var,onvalue="1",offvalue="0")
     chkTextable.grid(row=4,column=3,sticky='w')
     if textable:
         textable_var.set(str(textable))

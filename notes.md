@@ -5,21 +5,25 @@
 - [ ] need to make sure tick (and quotes?) are not used in queries.
 
 - [x] add horizontal and vertical scrollbars on the courses window
-- [ ] Add a participant
+- [x] Add a participant
 - [ ] Import participants (uses add fn)
+- [ ] Modify participant table to handle teams (relay)
+
 - [ ] Add volunteer
 - [ ] Import vol from csv 
 - [ ] Import vol from other db
 - [ ] Export vol to csv/db file
 - [ ] Assign vol to (something)
 - [ ] Create custom assignment (something)
+
 - [ ] Auto add/remove checkpoints to assignment options
 - [ ] List assignments
 - [ ] Change assignments
+
 - [ ] Record traffic
 - [ ] Mark traffic complete
+
 - [ ] Reports (see list below)
-- [ ] Modify participant table to handle teams (relay)
 - [ ] Map checkpoints
 - [ ] Map runners
 
