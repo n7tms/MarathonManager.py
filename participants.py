@@ -12,6 +12,8 @@ from tkinter import messagebox
 from tkinter import colorchooser
 from datetime import datetime
 from constants import *
+from participant_import import *
+
 
 def participants_filldata(tv:ttk.Treeview) -> None:
     """Clear and then fill/refresh the Checkpoints table with data"""
@@ -264,6 +266,41 @@ def participant_window(main_frame:tk.Frame) -> tk.Frame:
         item = int(tvParticipants.item(tvParticipants.focus(),"values")[0])
         participant_edit(item,tvParticipants)
 
+
+    def showContextMenu(event):
+        iid = tvParticipants.identify('item',event.x,event.y)
+
+        def p_e_r():
+            item = int(tvParticipants.item(tvParticipants.focus(),"values")[0])
+            participant_edit(item,tvParticipants)
+
+        def participant_delete():
+            print("Participant delete not yet implemented.")
+        
+
+        if iid:
+            tvParticipants.selection_set(iid)
+            tvParticipants.focus_set()
+            tvParticipants.focus(iid)
+
+            # Treeview right-click popup menu definition
+            context_menu = tk.Menu(main_frame,tearoff=0)
+            context_menu.add_command(label="Edit",command=p_e_r)
+            context_menu.add_separator()
+            context_menu.add_command(label="Delete",command=participant_delete)
+            context_menu.post(event.x_root,event.y_root)
+        else:
+            pass
+
+
+    def participant_import():
+        adds,colisions = 0,0
+        part_imp = tk.Tk()
+        part_imp.title("MM: Participants")
+        part_imp.geometry('800x600')
+        paim = import_window(part_imp)
+        
+
     title = ttk.Label(main_frame,text='Participants',font=('Arial',18))
     title.grid(row=0,column=0,columnspan=2,sticky='nw')
 
@@ -272,6 +309,9 @@ def participant_window(main_frame:tk.Frame) -> tk.Frame:
 
     btnNew = ttk.Button(main_frame,text="New Participant",command=participant_new)
     btnNew.grid(row=1,column=0,padx=5,pady=5,sticky='w')
+
+    btnImport = ttk.Button(main_frame,text="Import Participants",command=participant_import)
+    btnImport.grid(row=1,column=1,padx=5,pady=5,sticky='w')
 
     tvParticipants = ttk.Treeview(main_frame,column=("c1","c2","c3","c4","c5"),show='headings',selectmode='browse')
     tvParticipants.column("#1",anchor='center',minwidth=0,width=0)  # hidden
@@ -286,6 +326,7 @@ def participant_window(main_frame:tk.Frame) -> tk.Frame:
     tvParticipants.heading("#5",text="Bib",anchor='w')
     tvParticipants.grid(row=2,column=0,columnspan=3,padx=5,pady=5)
     tvParticipants.bind("<Double-1>",participant_edit_row)
+    tvParticipants.bind("<Button-3>",showContextMenu)
 
     yscrollbar = ttk.Scrollbar(main_frame,orient='vertical',command=tvParticipants.yview)
     yscrollbar.grid(row=2, column=3,pady=15,sticky='nse')
@@ -296,5 +337,8 @@ def participant_window(main_frame:tk.Frame) -> tk.Frame:
 
     btnClose = ttk.Button(main_frame,text="Close",command=participants_close)
     btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
+
+
+    
 
 

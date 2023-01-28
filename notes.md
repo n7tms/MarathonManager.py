@@ -6,6 +6,7 @@
 
 - [x] add horizontal and vertical scrollbars on the courses window
 - [x] Add a participant
+- [x] Add right-click function to participant treeview
 - [ ] Import participants (uses add fn)
 - [ ] Modify participant table to handle teams (relay)
 
