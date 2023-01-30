@@ -43,6 +43,7 @@ Some good examples of combining layout managers -- including frames within frame
 https://stackoverflow.com/questions/36506152/tkinter-grid-or-pack-inside-a-grid
 https://github.com/Akuli/tkinter-tutorial/blob/master/geometry-managers.md  
 
+Here is a "panel" manager: https://www.youtube.com/watch?v=9Hyltpk2tSM&list=PLCC34OHNcOtoC6GglhF3ncJ5rLwQrLGnV&index=49
 
 
 <br />
