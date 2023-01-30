@@ -25,6 +25,7 @@ from constants import *
 from courses import *
 from database import *
 from events import *
+import events2
 from sitings import *
 from participants import *
 
@@ -137,9 +138,11 @@ def mainmenubar(main_frame: tk.Frame) -> tk.Frame:
     
     def event_click():
         e_root = tk.Tk()
-        e_root.title("MM: Event")
-        e_root.geometry('350x150')
-        ew = event_window(e_root)
+        # e_root.title("MM: Event")
+        # e_root.geometry('350x150')
+        # ew = event_window(e_root)
+        window = events2.EventsWindow(e_root)
+        window.grab_set()
 
     def checkpoints_click():
         root = tk.Tk()
