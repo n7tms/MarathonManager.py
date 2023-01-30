@@ -19,14 +19,7 @@ from datetime import datetime
 # from PIL import ImageTk, Image
 
 from main import *
-from checkpoints import *
 from constants import *
-from courses import *
-from database import *
-from events import *
-import events2
-from sitings import *
-from participants import *
 
 
 

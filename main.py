@@ -6,6 +6,14 @@
 from tkinter import *
 from tkinter import ttk
 
+from checkpoints import *
+from courses import *
+from database import *
+# from events import *
+from events2 import *
+from sitings import *
+from participants import *
+
 
 class MainWindow:
 
@@ -95,12 +103,8 @@ class MainWindow:
 
     
     def event_click(self):
-        # e_root = tk.Tk()
-        # # e_root.title("MM: Event")
-        # # e_root.geometry('350x150')
-        # # ew = event_window(e_root)
-        # window = events2.EventsWindow(e_root)
-        # window.grab_set()
+        window = EventsWindow()
+        window.grab_set()
         pass
 
     def checkpoints_click(self):
@@ -118,11 +122,10 @@ class MainWindow:
         pass
 
     def participants_click(self):
-        # root = tk.Tk()
-        # root.title("MM: Participants")
-        # root.geometry('800x600')
-        # pw = participant_window(root)
-        pass
+        root = tk.Tk()
+        root.title("MM: Participants")
+        root.geometry('800x600')
+        pw = participant_window(root)
 
     def open_sitings(self):
         sitings = Tk()

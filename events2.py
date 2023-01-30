@@ -4,6 +4,7 @@ import sqlite3
 from pathlib import Path
 # from tkinter import Tk
 from tkinter import ttk
+# from tkinter import
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import colorchooser
@@ -12,14 +13,12 @@ from constants import *
 
 class EventsWindow:
     
-    def __init__(self, parent):
-        # options()
-        # super().__init__(parent)
-        # tk.Tk.iconbitmap(self, default="iconfile.ico")
+    def __init__(self):
 
-        # e_root = tk.Frame(self)
-        self.title(self,"MM: Event")
-        self.geometry(self,'350x150')
+        self.root = tk.Tk()
+        self.root.title("MM: Events")
+        self.root.geometry('450x200')
+        self.root.minsize(400,100)
 
         self.cn = sqlite3.connect(DB_NAME)
         self.cur = self.cn.cursor()
