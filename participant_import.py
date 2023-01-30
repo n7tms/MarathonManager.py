@@ -26,6 +26,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
 from constants import *
+import csv
 
 
 
@@ -38,14 +39,18 @@ def import_filldata(tv:ttk.Treeview,data:list) -> None:
     for row in data:
         tv.insert("",tk.END,values=row)
 
-def import_import():
-    pass
+def import_import(tv:ttk.Treeview) -> None:
+    """write the data in the treeview to the database"""
+    for x in tv.get_children():
+        print(tv.item(x)['values'])
+
+    
 
 def import_edit_row():
+    """Double-clicking a row fills the fields below. The fields can be changed and then saved back to the treeview."""
+    # https://www.youtube.com/watch?v=lKiNlSs_cms
     pass
 
-def import_cancel():
-    pass
 
 def import_read(lbl:tk.Label, tv:ttk.Treeview) -> None:
     out = []
@@ -57,69 +62,55 @@ def import_read(lbl:tk.Label, tv:ttk.Treeview) -> None:
     with open(filename,'r', encoding="utf8", errors="surrogateescape") as f:
         line = f.readline()
         while line:
-            x = line.split(',')
-            out.append(x)
+            x = [ '"{}"'.format(x) for x in list(csv.reader([line], delimiter=','))[0] ]
+            y = [z.replace('"','') for z in x]
+            out.append(y)
             line = f.readline()
     
     # Assign indices to headers
     # distance,First Name,Last Name,gender,Age,DOB,Email,Address,City,State,Zip,Country,Phone,Bib,emergency_name,emergency_phone
-    # idistance,ifirst,ilast,igender,iage,idob,iemail,iaddress,icity,istate,izip,icountry,iphone,ibib,iename,iephone = list([None] * 16)
-    # for i,h in enumerate(out[0].split(',')):
-    #     match h:
-    #         case "distance": idistance = i
-    #         case "First Name": ifirst = i
-    #         case "Last Name": ilast = i
-    #         case "gender": igender = i
-    #         case "Age": iage = i
-    #         case "DOB": idob = i
-    #         case "Email": iemail = i
-    #         case "Address": iaddress = i
-    #         case "City": iaddress = i
-    #         case "State": istate = i
-    #         case "Zip": izip = i
-    #         case "Country": icountry = i
-    #         case "Phone": iphone = i
-    #         case "Bib": ibib = i
-    #         case "emergency_name": iename = i
-            # case "emergency_phone": iephone = i
 
-    h_index = {}
-    for i,h in enumerate(out[0].split(',')):
+    h_index = [None] * 16
+    for i,h in enumerate(out[0]):
         match h:
-            case "distance": h_index["Course"] = i
-            case "First Name": h_index["First"] = i
-            case "Last Name": h_index["Last"] = i
-            case "gender": h_index["Gender"] = i
-            case "Age": h_index["Age"] = i
-            case "DOB": h_index["Birthdate"] = i
-            case "Email": h_index["Email"] = i
-            case "Address": h_index["Street1"] = i
-            case "City": h_index["City"] = i
-            case "State": h_index["State"] = i
-            case "Zip": h_index["Zipcode"] = i
-            case "Country": h_index["Country"] = i
-            case "Phone": h_index["Phone"] = i
-            case "Bib": h_index["Bib"] = i
-            case "emergency_name": h_index["eName"] = i
-            case "emergency_phone": h_index["ePhone"] = i
+            case "distance": h_index[0] = i
+            case "First Name": h_index[2] = i
+            case "Last Name": h_index[3] = i
+            case "gender": h_index[4] = i
+            case "Age": h_index[5] = i
+            case "DOB": h_index[8] = i
+            case "Email": h_index[6] = i
+            case "Address": h_index[9] = i
+            case "City": h_index[10] = i
+            case "State": h_index[11] = i
+            case "Zip": h_index[12] = i
+            case "Country": h_index[13] = i
+            case "Phone": h_index[7] = i
+            case "Bib": h_index[1] = i
+            case "emergency_name": h_index[14] = i
+            case "emergency_phone": h_index[15] = i
 
 # id, course, bib, first, last, gender, age, email, phone, birthday, address, city, state, zip, country, ename, ephone
 
     # normalize the data (put it in the correct order)
     normalized_data = []
-    for row in out[1:]:
-        x = row.split(',')
-        for j,a in enumerate(x):
-            
-
-    
-    import_filldata(tv,out)
+    for i,row in enumerate(out[1:]):
+        tmp=[]
+        tmp.append(i)
+        for j in range(0,len(row)):
+            tmp.append(row[h_index[j]])
+        normalized_data.append(tmp)
+       
+    import_filldata(tv,normalized_data)
 
     
 
 
 
 def import_window(main_frame:tk.Frame) -> tk.Frame:
+
+    def import_cancel():
+        main_frame.destroy()
 
     title = ttk.Label(main_frame,text='Participant Import',font=('Arial',18))
     title.grid(row=0,column=0,columnspan=2,sticky='nw')
@@ -180,7 +171,7 @@ def import_window(main_frame:tk.Frame) -> tk.Frame:
 
     # import_filldata(tvImport)
 
-    btnCancel = ttk.Button(main_frame,text="Import",command=import_import)
+    btnCancel = ttk.Button(main_frame,text="Import",command=lambda: import_import(tvImport))
     btnCancel.grid(row=5,column=2,padx=5,pady=5,sticky='w')
 
     btnCancel = ttk.Button(main_frame,text="Cancel",command=import_cancel)

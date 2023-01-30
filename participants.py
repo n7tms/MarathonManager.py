@@ -83,7 +83,7 @@ def participant_edit(pid=None,tv=None):
         croot.destroy()
 
     def update():
-        """Update an existing Checkpoint"""
+        """Update an existing Participant"""
         cn = sqlite3.connect(DB_NAME)
         cur = cn.cursor()
 
@@ -296,8 +296,8 @@ def participant_window(main_frame:tk.Frame) -> tk.Frame:
     def participant_import():
         adds,colisions = 0,0
         part_imp = tk.Tk()
-        part_imp.title("MM: Participants")
-        part_imp.geometry('800x600')
+        part_imp.title("MM: Participants Import")
+        part_imp.geometry('1000x600')
         paim = import_window(part_imp)
         
 
