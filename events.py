@@ -1,77 +1,109 @@
-import random
+# Marathon Manager - Events Window
+
 import sqlite3
-from pathlib import Path
-# from tkinter import Tk
 from tkinter import ttk
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import colorchooser
-import re
-from datetime import datetime
 from constants import *
 
-# =============================================================================
-#  Event Window
-# =============================================================================
+class EventsWindow:
+    
+    def __init__(self,master):
 
-def event_window(main_frame: tk.Frame) -> tk.Frame:
-    cn,cur = None,None
+        # self.root = tk.Tk()
+        self.master = master
 
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
+        self.root = tk.Frame(master)
+        self.root.pack()
 
-    def event_save():
+        master.title("MM: Events")
+        master.geometry('450x200')
+        master.minsize(400,100)
+
+        self.cn = sqlite3.connect(DB_NAME)
+        self.cur = self.cn.cursor()
+
+
+        # img2 = ImageTk.PhotoImage(file='runner_blue.png')
+        # imgLogo = ttk.Label(main_frame,image=img2)
+        self.imgLogo = ttk.Label(self.root,text="logo placeholder")
+        self.imgLogo.grid(row=0,column=0,rowspan=5)
+
+        self.lblID = ttk.Label(self.root,width=10)
+        self.lblID.grid(row=0,column=1, columnspan=2,sticky='w')
+        self.lblID.grid_remove()
+
+        self.lblEventName = ttk.Label(self.root,text='Event Name:',width=12)
+        self.lblEventName.grid(row=1,column=1,sticky='e', padx=5, pady=8)
+        self.txtEventName = ttk.Entry(self.root,width=25)
+        self.txtEventName.grid(row=1,column=2, columnspan=2,sticky='w')
+
+        self.lblDescription = ttk.Label(self.root,text='Description:',width=12)
+        self.lblDescription.grid(row=2,column=1,sticky='e',padx=5, pady=8)
+        self.txtDescription = tk.Entry(self.root,width=25)
+        self.txtDescription.grid(row=2,column=2, columnspan=2,sticky='w',padx=5, pady=8)
+
+        self.lblLocation = ttk.Label(self.root,text='Location:',width=12)
+        self.lblLocation.grid(row=3,column=1,sticky='e')
+        self.txtLocation = tk.Entry(self.root,width=10)
+        self.txtLocation.grid(row=3,column=2,sticky='w')
+
+        self.lblStartDate = ttk.Label(self.root,text='Start Date:',width=12)
+        self.lblStartDate.grid(row=4,column=1,sticky='e')
+        self.txtStartDate = tk.Entry(self.root,width=10)
+        self.txtStartDate.grid(row=4,column=2,sticky='w')
+
+        self.lblStartTime = ttk.Label(self.root,text='Start Time:',width=12)
+        self.lblStartTime.grid(row=5,column=1,sticky='e')
+        self.txtStartTime = tk.Entry(self.root,width=10)
+        self.txtStartTime.grid(row=5,column=2,sticky='w')
+
+        self.butSave = ttk.Button(self.root,text='Save',command=self.event_save)
+        self.butSave.grid(row=3,column=3)
+        self.butCancel = ttk.Button(self.root,text='Cancel',command=self.event_cancel)
+        self.butCancel.grid(row=4,column=3)
+
+        self.event_load()
+
+    def event_load(self):
+        """Load the field values from the database"""
+
+        def set_text(tw: tk.Entry, text: str):
+            tw.delete(0,'end')
+            tw.insert(0,text)
+
+        stmt = "select EventID, EventName, Description, Location, Starttime from Events;"
+        self.cur.execute(stmt)
+        res = self.cur.fetchone()
+
+        sd,st = res[4].split(' ')
+        # put the data into the fields
+        self.lblID.config(text=res[0])
+        set_text(self.txtEventName,res[1])
+        set_text(self.txtDescription,res[2])
+        set_text(self.txtLocation,res[3])
+        set_text(self.txtStartDate,sd)
+        set_text(self.txtStartTime,st)
+        
+
+    def event_save(self):
         # get the field values
-        eName = txtEventName.get()
-        eDescription = txtDescription.get()
-        eLocation = txtLocation.get()
-        eDate = txtStartDate.get()
-        eTime = txtStartTime.get()
+        eID = self.lblID['text']
+        eName = self.txtEventName.get()
+        eDescription = self.txtDescription.get()
+        eLocation = self.txtLocation.get()
+        eDate = self.txtStartDate.get()
+        eTime = self.txtStartTime.get()
         eStart = eDate + ' ' + eTime
 
         # TODO: Error checking; Do the fields contain valid information
 
-        stmt = "insert into Events (EventName, Description, Location, Starttime) values ('" + eName + "','" + eDescription + "','" + eLocation + "','" + eStart + "');"
-        res =  cur.execute(stmt)
-        cn.commit()
-        main_frame.destroy()
+        stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
+        res =  self.cur.execute(stmt,(eName,eDescription,eLocation,eStart,eID))
+        self.cn.commit()
+        self.master.destroy()
 
-    def event_cancel():
-        main_frame.destroy()
+    def event_cancel(self):
+        self.master.destroy()
 
-    # img2 = ImageTk.PhotoImage(file='runner_blue.png')
-    # imgLogo = ttk.Label(main_frame,image=img2)
-    imgLogo = ttk.Label(main_frame,text="logo placeholder")
-    imgLogo.grid(row=0,column=0,rowspan=5)
 
-    lblEventName = ttk.Label(main_frame,text='Event Name:',width=12)
-    lblEventName.grid(row=0,column=1,sticky='e', padx=5, pady=8)
-    txtEventName = ttk.Entry(main_frame,width=25)
-    txtEventName.grid(row=0,column=2, columnspan=2,sticky='w')
-    
-    lblDescription = ttk.Label(main_frame,text='Description:',width=12)
-    lblDescription.grid(row=1,column=1,sticky='e',padx=5, pady=8)
-    txtDescription = tk.Entry(main_frame,width=25)
-    txtDescription.grid(row=1,column=2, columnspan=2,sticky='w',padx=5, pady=8)
 
-    lblLocation = ttk.Label(main_frame,text='Location:',width=12)
-    lblLocation.grid(row=2,column=1,sticky='e')
-    txtLocation = tk.Entry(main_frame,width=10)
-    txtLocation.grid(row=2,column=2,sticky='w')
-
-    lblStartDate = ttk.Label(main_frame,text='Start Date:',width=12)
-    lblStartDate.grid(row=3,column=1,sticky='e')
-    txtStartDate = tk.Entry(main_frame,width=10)
-    txtStartDate.grid(row=3,column=2,sticky='w')
-
-    lblStartTime = ttk.Label(main_frame,text='Start Time:',width=12)
-    lblStartTime.grid(row=4,column=1,sticky='e')
-    txtStartTime = tk.Entry(main_frame,width=10)
-    txtStartTime.grid(row=4,column=2,sticky='w')
-
-    butSave = ttk.Button(main_frame,text='Save',command=event_save)
-    butSave.grid(row=3,column=3)
-    butCancel = ttk.Button(main_frame,text='Cancel',command=event_cancel)
-    butCancel.grid(row=4,column=3)
-    
-    return main_frame

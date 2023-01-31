@@ -29,6 +29,23 @@ from constants import *
 import csv
 
 
+class ImportParticipantsWindow():
+
+    def __init__(self,master):
+
+        self.master = master
+
+        self.root = tk.Frame(master)
+        self.root.pack()
+
+        master.title("MM: Import Participants")
+        master.geometry('1000x600')
+
+        self.cn = sqlite3.connect(DB_NAME)
+        self.cur = self.cn.cursor()
+
+
+
 
 def import_filldata(tv:ttk.Treeview,data:list) -> None:
     """Clear and then fill/refresh the Checkpoints table with data"""

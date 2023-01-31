@@ -10,7 +10,7 @@ from checkpoints import *
 from courses import *
 from database import *
 # from events import *
-from events2 import *
+from events import *
 from sitings import *
 from participants import *
 
@@ -103,10 +103,8 @@ class MainWindow:
 
     
     def event_click(self):
-        # window = EventsWindow()
-        # window.grab_set()
-        root = tk.Tk()
-        app = EventsWindow(root)
+        root = tk.Toplevel()
+        ew = EventsWindow(root)
 
     def checkpoints_click(self):
         # root = tk.Tk()
@@ -123,10 +121,9 @@ class MainWindow:
         pass
 
     def participants_click(self):
-        root = tk.Tk()
-        root.title("MM: Participants")
-        root.geometry('800x600')
-        pw = participant_window(root)
+        root = tk.Toplevel()
+        pw = ParticipantsWindow(root)
+
 
     def open_sitings(self):
         sitings = Tk()
