@@ -11,8 +11,8 @@
 # Imports
 import sqlite3
 from pathlib import Path
-from tkinter import ttk
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 from tkinter import colorchooser
 from datetime import datetime
