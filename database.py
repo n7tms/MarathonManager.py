@@ -69,6 +69,7 @@ def create_database(db_name: str = None) -> bool:
             Firstname TEXT, 
             Lastname TEXT, 
             Gender TEXT, 
+            Age INTEGER
             Birthdate TEXT, 
             Phone TEXT, 
             Textable INTEGER, 
@@ -78,10 +79,11 @@ def create_database(db_name: str = None) -> bool:
             City TEXT, 
             State TEXT, 
             Zipcode TEXT, 
+            Country TEXT,
             EContactName TEXT, 
             EContactPhone TEXT, 
             EventID	INTEGER,
-            RaceID	INTEGER,
+            CourseID INTEGER,
             Bib	INTEGER,
             PRIMARY KEY(ParticipantID AUTOINCREMENT)
         )"""

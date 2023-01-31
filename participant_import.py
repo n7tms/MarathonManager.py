@@ -132,13 +132,26 @@ class ImportParticipantsWindow():
 
         # Get a list of courseID's into a dictionary for quick reference.
         stmt = """select CourseID, CourseName from Courses;"""
-        cn
+        self.cur.execute(stmt)
+        rows = self.cur.fetchall()
+        course_info = {}
+        for row in rows:
+            course_info[row[1]] = row[0]
+
+        # distance		Bib Firstname	Lastname	gender	Age	Email	Phone	DOB	Address	City	State	Zip	Country	ename	ephone
 
         for x in data:
             # does the bib already exist? If so, update data
-            stmt = """insert into Participants ("""
+            cid = course_info[x[0]]
+            x.insert(1,cid)
+            stmt = """insert into Participants (CourseID,Bib,Firstname,Lastname,Gender,Age,Email,Phone,Birthdate,Street1,City,State,Zipcode,Country,EContactName,EContactPhone) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"""
+            print(tuple(x[1:]))
+            self.cur.execute(stmt,tuple(x[1:]))
+        self.cn.commit()
 
-    
+        messagebox.showinfo(message='Import complete.')
+
 
     def import_edit_row(self,tv:ttk.Treeview) -> None:
         """Double-clicking a row fills the fields below. The fields can be changed and then saved back to the treeview."""
