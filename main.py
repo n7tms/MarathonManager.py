@@ -103,9 +103,10 @@ class MainWindow:
 
     
     def event_click(self):
-        window = EventsWindow()
-        window.grab_set()
-        pass
+        # window = EventsWindow()
+        # window.grab_set()
+        root = tk.Tk()
+        app = EventsWindow(root)
 
     def checkpoints_click(self):
         # root = tk.Tk()
