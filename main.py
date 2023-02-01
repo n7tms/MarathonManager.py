@@ -13,6 +13,7 @@ from database import *
 from events import *
 from sitings import *
 from participants import *
+from volunteers import *
 
 
 class MainWindow:
@@ -36,6 +37,9 @@ class MainWindow:
 
         btnParticipants = ttk.Button(self.root,text="Participants",command=self.participants_click)
         btnParticipants.grid(row=2,column=0,padx=10,pady=10,sticky='news')
+
+        btnVolunteers = ttk.Button(self.root,text="Volunteers",command=self.open_volunteers)
+        btnVolunteers.grid(row=3,column=0,padx=10,pady=10,sticky='news')
 
 
         # # Reports/Status
@@ -142,7 +146,9 @@ class MainWindow:
         pass
 
     def open_volunteers(self):
-        pass
+        root = tk.Toplevel()
+        vw = VolunteersWindow(root)
+
 
     def open_messages(self):
         pass

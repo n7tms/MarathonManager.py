@@ -165,7 +165,6 @@ class ImportParticipantsWindow():
 
         filename = filedialog.askopenfilename(title="MM: Select File to Import",filetypes=(("csv","*.csv"),("txt","*.txt"),("All Files","*.*")))
         lbl.config(text=filename)
-        print(filename)
 
         with open(filename,'r', encoding="utf8", errors="surrogateescape") as f:
             line = f.readline()

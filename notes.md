@@ -3,11 +3,6 @@
 ## TODO
 - [ ] Create the edit siting window and function
 - [ ] need to make sure tick (and quotes?) are not used in queries.
-
-- [x] add horizontal and vertical scrollbars on the courses window
-- [x] Add a participant
-- [x] Add right-click function to participant treeview
-- [ ] Import participants (uses add fn)
 - [ ] Modify participant table to handle teams (relay)
 
 - [ ] Add volunteer
@@ -28,8 +23,15 @@
 - [ ] Map checkpoints
 - [ ] Map runners
 
+- [ ] Put more detail in the README.md file
+
+
 - [x] Modify checkpoint code to deal with actual location
 - [x] Is it possible to hide a CheckpointID in the cmbCheckpoint element?
+- [x] add horizontal and vertical scrollbars on the courses window
+- [x] Add a participant
+- [x] Add right-click function to participant treeview
+- [x] Import participants (uses add fn)
 
 
 
