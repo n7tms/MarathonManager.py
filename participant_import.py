@@ -5,6 +5,7 @@
 # Description
 # Reads the file supplied by the timers and adds runners to the database
 #
+# TODO make this explanation more accurate to the way things really are in this module
 # Explanation
 # This process is looking for the following headers/fields in the file:
 # RACE_NAME    (5K, Half Marathon, 10K, Marathon, etc.)
@@ -20,7 +21,6 @@
 
 
 import sqlite3
-from pathlib import Path
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
@@ -45,6 +45,7 @@ class ImportParticipantsWindow():
         self.cur = self.cn.cursor()
 
 
+        # TODO fix this grid layout; all of the widgets are misaligned
         self.title = ttk.Label(self.root,text='Participant Import',font=('Arial',18))
         self.title.grid(row=0,column=0,columnspan=2,sticky='nw')
 
@@ -102,15 +103,11 @@ class ImportParticipantsWindow():
         self.yscrollbar.configure(command=self.tvImport.yview)    
         self.tvImport.configure(yscrollcommand=self.yscrollbar.set)
 
-        # import_filldata(tvImport)
-
         self.btnImport = ttk.Button(self.root,text="Import",command=lambda: self.import_import(self.tvImport))
         self.btnImport.grid(row=5,column=2,padx=5,pady=5,sticky='w')
 
         self.btnCancel = ttk.Button(self.root,text="Cancel",command=self.import_cancel)
         self.btnCancel.grid(row=6,column=3,padx=5,pady=5,sticky='w')
-
-# =============================================
 
 
     def import_filldata(self,tv:ttk.Treeview,data:list) -> None:
@@ -138,18 +135,21 @@ class ImportParticipantsWindow():
         for row in rows:
             course_info[row[1]] = row[0]
 
-        # distance		Bib Firstname	Lastname	gender	Age	Email	Phone	DOB	Address	City	State	Zip	Country	ename	ephone
-
         for x in data:
-            # does the bib already exist? If so, update data
-            cid = course_info[x[0]]
-            x.insert(1,cid)
+            # TODO does the bib already exist? If so, "update" data
+
+            # put the CourseID in position 0
+            x.insert(1,course_info[x[0]])
+
+            # insert this participant into the Participants table
             stmt = """insert into Participants (CourseID,Bib,Firstname,Lastname,Gender,Age,Email,Phone,Birthdate,Street1,City,State,Zipcode,Country,EContactName,EContactPhone) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"""
-            print(tuple(x[1:]))
             self.cur.execute(stmt,tuple(x[1:]))
+
+        # commit all of the inserts at the same time
         self.cn.commit()
 
+        # TODO include the count of inserted records and collisions
         messagebox.showinfo(message='Import complete.')
 
 
@@ -160,6 +160,7 @@ class ImportParticipantsWindow():
 
 
     def import_read(self,lbl:tk.Label, tv:ttk.Treeview) -> None:
+        """Read the data to be imported from a file and populate the Treeview with it."""
         out = []
 
         filename = filedialog.askopenfilename(title="MM: Select File to Import",filetypes=(("csv","*.csv"),("txt","*.txt"),("All Files","*.*")))
@@ -174,9 +175,7 @@ class ImportParticipantsWindow():
                 out.append(y)
                 line = f.readline()
         
-        # Assign indices to headers
-        # distance,First Name,Last Name,gender,Age,DOB,Email,Address,City,State,Zip,Country,Phone,Bib,emergency_name,emergency_phone
-
+        # Assign indices to headers so we can easily edit them later
         h_index = [None] * 16
         for i,h in enumerate(out[0]):
             match h:
@@ -197,7 +196,6 @@ class ImportParticipantsWindow():
                 case "emergency_name": h_index[14] = i
                 case "emergency_phone": h_index[15] = i
 
-    # id, course, bib, first, last, gender, age, email, phone, birthday, address, city, state, zip, country, ename, ephone
 
         # normalize the data (put it in the correct order)
         normalized_data = []
@@ -213,8 +211,5 @@ class ImportParticipantsWindow():
     
 
     def import_cancel(self):
+        """Cancel everything and close this window"""
         self.master.destroy()
-
-
-
-
