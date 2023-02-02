@@ -5,7 +5,6 @@
 - [ ] need to make sure tick (and quotes?) are not used in queries.
 - [ ] Modify participant table to handle teams (relay)
 
-- [ ] Add volunteer
 - [ ] Import vol from csv 
 - [ ] Import vol from other db
 - [ ] Export vol to csv/db file
@@ -32,6 +31,7 @@
 - [x] Add a participant
 - [x] Add right-click function to participant treeview
 - [x] Import participants (uses add fn)
+- [x] Add volunteer
 
 
 
