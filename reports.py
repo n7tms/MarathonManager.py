@@ -69,3 +69,9 @@ class Reports:
         
 
 
+# this gets the lead runner as long as there has only been one visit -- it gets the first visit; not the last visit
+# select ParticipantID,CheckpointID,Sitingtime from Sitings where CheckpointID=4 and Sitingtime = (select min(Sitingtime) from Sitings where CheckpointID=4);
+# need to modify this statement to only consider the minimum times of the last visit of each participant
+
+# This statements gets all of the last visits from a checkpoint.
+# select ParticipantID, max(Sitingtime) from Sitings where CheckpointID=2 group by ParticipantID;

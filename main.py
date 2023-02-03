@@ -111,18 +111,16 @@ class MainWindow:
         ew = EventsWindow(root)
 
     def checkpoints_click(self):
-        # root = tk.Tk()
-        # root.title("MM: Checkpoints")
-        # root.geometry('700x340')
-        # ew = checkpoint_window(root)
-        pass
+        root = tk.Tk()
+        root.title("MM: Checkpoints")
+        root.geometry('700x340')
+        ew = checkpoint_window(root)
 
     def courses_click(self):
-        # root = tk.Tk()
-        # root.title("MM: Courses")
-        # root.geometry('735x380')
-        # ew = courses_window(root)
-        pass
+        root = tk.Tk()
+        root.title("MM: Courses")
+        root.geometry('735x380')
+        ew = courses_window(root)
 
     def participants_click(self):
         root = tk.Toplevel()
