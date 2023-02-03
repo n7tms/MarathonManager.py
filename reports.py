@@ -8,6 +8,9 @@
 #   list of DNF
 #   list of overdue runners (bib, name, phone, econtact, last checkpoint, elapsed time since last seen, next checkpoint)
 
+import sqlite3
+from constants import *
+
 class Reports:
 
     def __init__(self):
@@ -27,4 +30,42 @@ class Reports:
         #   elif particpant.checkpoint == leader's and particpant.arrivaltime < leaders
         #       set leader = this participant
         # return leader
+
+        cn = sqlite3.connect(DB_NAME)
+        cur = cn.cursor()
+
+        # Get the path for this courseid
+        stmt = """select Path from Courses where CourseID=?"""
+        cur.execute(stmt,courseid)
+        course_path = cur.fetchone()
+
+        # Convert the checkpoints to courseid's (for convenience)
+        path_by_id = []
+        checkpoints = course_path.split(",").strip()
+        for cp in checkpoints:
+            stmt = """select CourseID from Courses where CourseName=?;"""
+            cur.execute(stmt,cp)
+            cpid = cur.fetchone()
+            path_by_id.append(cpid)
+
+        # Get a list of participants assigned to this course
+        # TODO How do I deal with bibs that were added adhoc -- that are not assigned to a course?
+        stmt = """select ParticipantID from Participants where CourseID=?;"""
+        cur.execute(stmt,courseid)
+        pids = cur.fetchall()
+
+        # Iterate through the participants and the paths to determine which is the furtherest first
+        for part in pids:
+            p = part[0]
+            # perform a query of the first time p arrived at each checkpoint order by time
+            # TODO What if it is a circular course; One checkpoint and the participants repeatedly pass it; this query would only return the first time they visited the CP
+            
+
+
+
+
+        for row in rows:
+            tv.insert("",tk.END,values=row)
+        
+
 
