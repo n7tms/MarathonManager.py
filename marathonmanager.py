@@ -116,8 +116,8 @@ def messages(main_frame: tk.Frame) -> tk.Frame:
 
 
 def initialize():
-    global CONN 
-    global CUR
+    global cn 
+    global cur
     
     # open the database
     # # TODO: this needs to be modified to check for valid fields (a db version?)
@@ -127,16 +127,18 @@ def initialize():
     #     create_settings_database()
     #     CONN.close()
 
-    if not database_exists(DB_NAME):
-        CONN = sqlite3.connect(DB_NAME)
-        CUR = CONN.cursor()
-        create_database()
-        CONN.close()
+    # if not database_exists(DB_NAME):
+    #     cn = sqlite3.connect(DB_NAME)
+    #     cur = cn.cursor()
+    #     create_database()
+    #     cn.close()
 
-    CONN = sqlite3.connect(DB_NAME)
-    CUR = CONN.cursor()
+    create_database()
+    
+    cn = sqlite3.connect(DB_NAME)
+    cur = cn.cursor()
 
-    res = CUR.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
+    res = cur.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
     # reslst = list(res)
     db_version = int(list(res)[0][0])
     # db_version = 1

@@ -18,8 +18,8 @@ def courses_filldata(tv:ttk.Treeview) -> None:
         tv.delete(item)
 
     # get the courses from the database
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
+    # cn = sqlite3.connect(DB_NAME)
+    # cur = cn.cursor()
     cur.execute("select CourseID, CourseName, Distance, Color, Path from Courses;")
     rows = cur.fetchall()
     
@@ -39,25 +39,59 @@ def course_edit(item,tv):
         """Cancel any operations in this window and close it"""
         c_root.destroy()
     
+    def populate_path(cid:int,path:str) -> bool:
+        # delete all of the path entries for this CourseID (cid)
+        stmt = "delete from Paths where CourseID=?;"
+        cur.execute(stmt,[cid])
+        
+        # Get a list of checkpoints
+        all_cps = {}
+        stmt = "select CheckpointID, CPName from Checkpoints;"
+        cur.execute(stmt)
+        cps = cur.fetchall()
+        for c in cps:
+            all_cps[c[1]] = c[0]
+        
+        # iterate through the path
+        checkpoints = path.split(",")
+        for i,c in enumerate(checkpoints):
+            # if the checkpoint exists in the checkpoint list, add an entry in the path
+            if c not in all_cps:
+                messagebox.showerror("MM: Error","Checkpoint not found: " + str(c))
+                return False
+
+            stmt = "insert into Paths (EventID, CourseID, CheckpointID, CPOrder) values (?,?,?,?);"
+            cur.execute(stmt,[1,cid,all_cps[c],i])
+            cn.commit()
+        return True
+
     def save():
         """Create a new Course"""
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
+        # cn = sqlite3.connect(DB_NAME)
+        # cur = cn.cursor()
 
         cname = txtName.get()
         cdistance = txtDistance.get()
         ccolor = txtColor.get()
         cpath = txtPath.get()
         cur.execute("insert into Courses (CourseName, Distance, Color, Path) values (?,?,?,?);",[cname,cdistance,ccolor,cpath])
-        cn.commit()
 
-        courses_filldata(tv)
-        c_root.destroy()
+        # Populate the Path table with the updated path from above
+        cur.execute("select last_insert_rowid();")
+        new_idx = cur.fetchone()
+        if populate_path(new_idx[0],cpath):
+            # Refresh the Course Treeview and kill this window
+            courses_filldata(tv)
+            c_root.destroy()
+        else:
+            # something went wrong (eg. invalid checkpoint, probably)
+            cur.execute("delete from Courses where CourseID=?",[new_idx])
+
 
     def update():
         """Update an existing Course"""
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
+        # cn = sqlite3.connect(DB_NAME)
+        # cur = cn.cursor()
 
         cname = txtName.get()
         cdistance = txtDistance.get()
@@ -66,8 +100,11 @@ def course_edit(item,tv):
         cur.execute("update Courses set CourseName=?, Distance=?, Color=?, Path=? where CourseID=?",[cname,cdistance,ccolor,cpath,cid])
         cn.commit()
 
-        courses_filldata(tv)
-        c_root.destroy()
+        if populate_path(cid,cpath):
+            courses_filldata(tv)
+            c_root.destroy()
+        else:
+            pass
 
     def choose_color():
         current_color = txtColor.get()
@@ -129,10 +166,10 @@ def course_edit(item,tv):
 
 
 def courses_window(main_frame:tk.Frame) -> tk.Frame:
-    cn,cur = None,None
+    # cn,cur = None,None
 
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
+    # cn = sqlite3.connect(DB_NAME)
+    # cur = cn.cursor()
 
 
     def courses_close():

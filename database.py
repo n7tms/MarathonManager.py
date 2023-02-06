@@ -6,6 +6,7 @@
 
 import sqlite3
 from pathlib import Path
+from constants import *
 
 
 def database_exists(db_name: str) -> bool:
@@ -19,12 +20,10 @@ def database_exists(db_name: str) -> bool:
 def create_database(db_name: str = None) -> bool:
     """Create the initial Marathon Manager database and populate it with some
     global data."""
-    global CONN
-    global CUR
 
     # # Users Table
     # sStmt = """CREATE TABLE Users (UserID INTEGER, PersonID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"""
-    # CUR.execute(sStmt)
+    # cur.execute(sStmt)
 
     # Volunteers Table
     sStmt = """CREATE TABLE IF NOT EXISTS Volunteers (
@@ -49,10 +48,10 @@ def create_database(db_name: str = None) -> bool:
             Permission INTEGER,
             PRIMARY KEY(VolunteerID AUTOINCREMENT)
             );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Volunteer Log Table (history of assignments, check-ins and -outs)
-    sStmt = """CREATE TABLE VolLog (
+    sStmt = """CREATE TABLE IF NOT EXISTS VolLog (
             LogID	INTEGER UNIQUE,
             VolunteerID INTEGER,
             EventID	INTEGER,
@@ -61,10 +60,10 @@ def create_database(db_name: str = None) -> bool:
             Checkout	TEXT,
             PRIMARY KEY(LogID AUTOINCREMENT)
         )"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Participants Table
-    sStmt = """CREATE TABLE Participants (
+    sStmt = """CREATE TABLE IF NOT EXISTS Participants (
             ParticipantID	INTEGER UNIQUE,
             Firstname TEXT, 
             Lastname TEXT, 
@@ -87,10 +86,10 @@ def create_database(db_name: str = None) -> bool:
             Bib	INTEGER,
             PRIMARY KEY(ParticipantID AUTOINCREMENT)
         )"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Events Table
-    sStmt = """CREATE TABLE Events (
+    sStmt = """CREATE TABLE IF NOT EXISTS Events (
             EventID	INTEGER UNIQUE,
             EventName	TEXT,
             Description	TEXT,
@@ -100,10 +99,10 @@ def create_database(db_name: str = None) -> bool:
             PublicCode	TEXT UNIQUE,
             PRIMARY KEY(EventID AUTOINCREMENT)
         );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Courses Table
-    sStmt = """CREATE TABLE Courses (
+    sStmt = """CREATE TABLE IF NOT EXISTS Courses (
             CourseID	INTEGER UNIQUE,
             EventID	INTEGER,
             CourseName	TEXT,
@@ -112,10 +111,10 @@ def create_database(db_name: str = None) -> bool:
             Path    TEXT,
             PRIMARY KEY(CourseID AUTOINCREMENT)
         );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Checkpoints Table
-    sStmt = """CREATE TABLE Checkpoints (
+    sStmt = """CREATE TABLE IF NOT EXISTS Checkpoints (
             CheckpointID	INTEGER UNIQUE,
             EventID	INTEGER,
             CPName	TEXT,
@@ -124,10 +123,21 @@ def create_database(db_name: str = None) -> bool:
             Latitude	NUMERIC,
             PRIMARY KEY(CheckpointID AUTOINCREMENT)
         );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
+
+    # Paths Table (order of checkpoints)
+    sStmt = """CREATE TABLE IF NOT EXISTS Paths (
+            PathID	INTEGER UNIQUE,
+            EventID	INTEGER,
+            CourseID INTEGER,
+            CheckpointID INTEGER,
+            CPOrder INTEGER,
+            PRIMARY KEY(PathID AUTOINCREMENT)
+        );"""
+    cur.execute(sStmt)
 
     # Sitings Table
-    sStmt = """CREATE TABLE Sitings (
+    sStmt = """CREATE TABLE IF NOT EXISTS Sitings (
             SitingID	INTEGER UNIQUE,
             EventID	INTEGER,
             CheckpointID	INTEGER,
@@ -135,10 +145,10 @@ def create_database(db_name: str = None) -> bool:
             Sitingtime	TEXT,
             PRIMARY KEY(SitingID AUTOINCREMENT)
         );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Traffic Table
-    sStmt = """CREATE TABLE Traffic (
+    sStmt = """CREATE TABLE IF NOT EXISTS Traffic (
             TrafficID	INTEGER UNIQUE,
             EventID	INTEGER,
             Logtime	TEXT,
@@ -149,26 +159,33 @@ def create_database(db_name: str = None) -> bool:
             Status	TEXT,
             PRIMARY KEY(TrafficID AUTOINCREMENT)
         );"""
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
-    CONN.commit()
+    cn.commit()
 
     sStmt = "CREATE TABLE IF NOT EXISTS Settings (SettingID INTEGER UNIQUE, SettingName TEXT, SettingValue TEXT, PRIMARY KEY(SettingID AUTOINCREMENT))"
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     sStmt = "CREATE TABLE IF NOT EXISTS Recents (RecentID INTEGER UNIQUE, EventName TEXT, DBPath TEXT, PRIMARY KEY(RecentID AUTOINCREMENT))"
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Add the settings fields
-    # sStmt = 'INSERT INTO Settings (SettingName, SettingValue) VALUES ("DBVersion","1")'
-    CUR.execute("""INSERT INTO Settings (SettingName, SettingValue) VALUES ('DBVersion','1')""")
-    CONN.commit()
+    stmt = "select SettingName from Settings where SettingName='DBVersion';"
+    cur.execute(stmt)
+    setting_exists = cur.fetchone()
+    if not setting_exists:
+        cur.execute("""INSERT INTO Settings (SettingName, SettingValue) VALUES ('DBVersion','1')""")
+        cn.commit()
 
     # Local Users Table
     sStmt = "CREATE TABLE IF NOT EXISTS LocalUsers (UserID INTEGER, Username TEXT, Password TEXT, Permission INTEGER)"
-    CUR.execute(sStmt)
+    cur.execute(sStmt)
 
     # Add a local admin user
-    sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
-    CUR.execute(sStmt)
-    CONN.commit()
+    stmt = "select Username from LocalUsers where Username='admin';"
+    cur.execute(stmt)
+    user_exists = cur.fetchone()
+    if not user_exists:
+        sStmt = "INSERT INTO LocalUsers (Username, Password, Permission) VALUEs ('admin', 'admin', 1)"
+        cur.execute(sStmt)
+        cn.commit()
