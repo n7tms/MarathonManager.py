@@ -35,37 +35,63 @@ class Reports:
         cur = cn.cursor()
 
         # Get the path for this courseid
-        stmt = """select Path from Courses where CourseID=?"""
-        cur.execute(stmt,courseid)
+        stmt = "select Path from Courses where CourseID=?"
+        cur.execute(stmt,[courseid])
         course_path = cur.fetchone()
 
-        # Convert the checkpoints to courseid's (for convenience)
+        # Convert the checkpoints to checkpoint ID's (for convenience)
         path_by_id = []
-        checkpoints = course_path.split(",").strip()
+        checkpoints = course_path[0].split(",")
         for cp in checkpoints:
-            stmt = """select CourseID from Courses where CourseName=?;"""
-            cur.execute(stmt,cp)
+            stmt = "select CheckpointID from Checkpoints where CPName=?;"
+            cur.execute(stmt,[cp])
             cpid = cur.fetchone()
-            path_by_id.append(cpid)
+            path_by_id.append(cpid[0])
+        print(path_by_id)
 
-        # Get a list of participants assigned to this course
-        # TODO How do I deal with bibs that were added adhoc -- that are not assigned to a course?
-        stmt = """select ParticipantID from Participants where CourseID=?;"""
-        cur.execute(stmt,courseid)
-        pids = cur.fetchall()
+        # Reverse the path (we want to test from the finish back...but ignore the finish)
+        reverse_path = path_by_id[::-1]
+        print(reverse_path)
+        paths_to_test = reverse_path[1:]
+        print(paths_to_test)
 
-        # Iterate through the participants and the paths to determine which is the furtherest first
-        for part in pids:
-            p = part[0]
-            # perform a query of the first time p arrived at each checkpoint order by time
-            # TODO What if it is a circular course; One checkpoint and the participants repeatedly pass it; this query would only return the first time they visited the CP
+       
+        # Iterate through each checkpoint in reverse order
+        # Get a list of the last visit by each participant
+        # Determine who got there first (earliest time)
+        # If the earliest runner is after what is stored in the lead_runner variable, replace the lead_runner
+        lead_runner = {}    # {'ParticipantID': x, 'Arrival_Time': y}
+        for cp in paths_to_test:
+            lead_at_cp = {}
+            stmt = "select ParticipantID, max(Sitingtime) from Sitings where CheckpointID=? group by ParticipantID;"
+            cur.execute(stmt,[cp])
+            participants = cur.fetchall()
+            for p in participants:
+                if len(lead_at_cp) == 0:
+                    lead_at_cp["ParticipantID"] = p[0]
+                    lead_at_cp["Arrival_Time"] = p[1]
+                elif p[1] < lead_at_cp["Arrival_Time"]:
+                    lead_at_cp.update({"ParticipantID": p[0]})
+                    lead_at_cp.update({"Arrival_Time": p[1]})
             
+            if len(lead_at_cp) > 0:
+                if len(lead_runner) == 0:
+                    # lead_runner["ParticipantID"] = lead_at_cp["ParticipantID"]
+                    # lead_runner["Arrival_Time"] = lead_at_cp["Arrival_Time"]
+                    lead_runner = lead_at_cp.copy()
+                elif lead_at_cp["Arrival_Time"] > lead_runner["Arrival_Time"]:
+                    lead_runner.update({"ParticipantID": lead_at_cp["ParticipantID"]})
+                    lead_runner.update({"Arrival_Time": lead_at_cp["Arrival_Time"]})
+
+        print(lead_runner)
 
 
+# TODO ===========================================================
+# As this function stands, it finds the lead_runner is:
+#   {'ParticipantID': 5, 'Arrival_Time': '2023-02-03 11:40'}
+# Does this match with the example on the whiteboard
+# TODO ===========================================================
 
-
-        for row in rows:
-            tv.insert("",tk.END,values=row)
         
 
 
@@ -75,3 +101,7 @@ class Reports:
 
 # This statements gets all of the last visits from a checkpoint.
 # select ParticipantID, max(Sitingtime) from Sitings where CheckpointID=2 group by ParticipantID;
+
+def show_report():
+    r = Reports()
+    r.lead_runner(4)    # find the lead runner for courseID 4 (30K)

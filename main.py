@@ -14,7 +14,7 @@ from events import *
 from sitings import *
 from participants import *
 from volunteers import *
-
+from reports import *
 
 class MainWindow:
 
@@ -40,6 +40,9 @@ class MainWindow:
 
         btnVolunteers = ttk.Button(self.root,text="Volunteers",command=self.open_volunteers)
         btnVolunteers.grid(row=3,column=0,padx=10,pady=10,sticky='news')
+
+        btnReports = ttk.Button(self.root,text="Reports",command=self.open_reports)
+        btnReports.grid(row=4,column=0,padx=10,pady=10,sticky='news')
 
 
         # # Reports/Status
@@ -136,10 +139,12 @@ class MainWindow:
 
     def open_reports(self):
         root = Tk()
-        root.title("MM: Checkpoints")
+        root.title("MM: Reports")
         root.geometry('825x340')
-        ew = checkpoint_window(root)
+        # ew = checkpoint_window(root)
+        show_report()
 
+        
     def open_log(self):
         pass
 
