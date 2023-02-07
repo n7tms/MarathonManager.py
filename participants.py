@@ -19,8 +19,8 @@ class ParticipantsWindow:
         master.geometry('800x600')
         master.minsize(400,100)
 
-        self.cn = sqlite3.connect(DB_NAME)
-        self.cur = self.cn.cursor()
+        # self.cn = sqlite3.connect(DB_NAME)
+        # self.cur = self.cn.cursor()
 
 
         self.title = ttk.Label(self.root,text='Participants',font=('Arial',18))
@@ -117,8 +117,8 @@ class ParticipantsWindow:
             tv.delete(item)
 
         # get the checkpoints from the database
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
+        # cn = sqlite3.connect(DB_NAME)
+        # cur = cn.cursor()
 
         # This SQL statement retrieves all of the participants regardless if a courseid has been assigned.
         cur.execute("select ParticipantID, Lastname || ', ' || Firstname as Name, c.CourseID, CourseName, Bib from Participants as p LEFT JOIN Courses as c ON p.CourseID=c.CourseID;")
@@ -128,8 +128,8 @@ class ParticipantsWindow:
 
 
     def participant_edit(self,pid=None,tv=None):
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
+        # cn = sqlite3.connect(DB_NAME)
+        # cur = cn.cursor()
         textable_var = tk.StringVar()
         gender_var = tk.StringVar()
 
@@ -149,8 +149,8 @@ class ParticipantsWindow:
 
         def save():
             """Create/insert a new participant"""
-            cn = sqlite3.connect(DB_NAME)
-            cur = cn.cursor()
+            # cn = sqlite3.connect(DB_NAME)
+            # cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()
@@ -179,8 +179,8 @@ class ParticipantsWindow:
 
         def update():
             """Update an existing Participant"""
-            cn = sqlite3.connect(DB_NAME)
-            cur = cn.cursor()
+            # cn = sqlite3.connect(DB_NAME)
+            # cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()

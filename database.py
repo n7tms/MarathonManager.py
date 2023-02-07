@@ -68,7 +68,7 @@ def create_database(db_name: str = None) -> bool:
             Firstname TEXT, 
             Lastname TEXT, 
             Gender TEXT, 
-            Age INTEGER
+            Age INTEGER,
             Birthdate TEXT, 
             Phone TEXT, 
             Textable INTEGER, 

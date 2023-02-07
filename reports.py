@@ -2,8 +2,8 @@
 #
 #
 # Generate reports for:
-#   lead runner (for each course)
-#   last runner (for each course)
+#   lead runner (for each course, including unknowns)
+#   last runner (for each course, including unknowns)
 #   list of DNS
 #   list of DNF
 #   list of overdue runners (bib, name, phone, econtact, last checkpoint, elapsed time since last seen, next checkpoint)
@@ -31,24 +31,17 @@ class Reports:
         #       set leader = this participant
         # return leader
 
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
-
         # Get the path for this courseid
-        stmt = "select Path from Courses where CourseID=?"
+        stmt = "select CheckpointID from Paths where CourseID=? order by CPOrder ASC"
         cur.execute(stmt,[courseid])
-        course_path = cur.fetchone()
+        course_path = cur.fetchall()
 
         # Convert the checkpoints to checkpoint ID's (for convenience)
         path_by_id = []
-        checkpoints = course_path[0].split(",")
-        for cp in checkpoints:
-            stmt = "select CheckpointID from Checkpoints where CPName=?;"
-            cur.execute(stmt,[cp])
-            cpid = cur.fetchone()
-            path_by_id.append(cpid[0])
-        # print(path_by_id)
-        paths_to_test = path_by_id[:-1]
+        for cp in course_path:
+            path_by_id.append(cp[0])
+        print(path_by_id)
+        paths_to_test = path_by_id[:-1] # remove the finish
 
         # Reverse the path (we want to test from the finish back...but ignore the finish)
         # reverse_path = path_by_id[::-1]
@@ -64,8 +57,8 @@ class Reports:
         lead_runner = {}    # {'ParticipantID': x, 'Arrival_Time': y}
         for cp in paths_to_test:
             lead_at_cp = {}
-            stmt = "select ParticipantID, max(Sitingtime) from Sitings where CheckpointID=? group by ParticipantID;"
-            cur.execute(stmt,[cp])
+            stmt = "select s.ParticipantID, max(s.Sitingtime) from Sitings s inner join Participants p on s.ParticipantID = p.ParticipantID where s.CheckpointID=? and p.CourseID=? group by s.ParticipantID;"
+            cur.execute(stmt,[cp,courseid])
             participants = cur.fetchall()
             for p in participants:
                 if len(lead_at_cp) == 0:
@@ -105,24 +98,17 @@ class Reports:
         #       set leader = this participant
         # return leader
 
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
-
         # Get the path for this courseid
-        stmt = "select Path from Courses where CourseID=?"
+        stmt = "select CheckpointID from Paths where CourseID=? order by CPOrder ASC"
         cur.execute(stmt,[courseid])
-        course_path = cur.fetchone()
+        course_path = cur.fetchall()
 
         # Convert the checkpoints to checkpoint ID's (for convenience)
         path_by_id = []
-        checkpoints = course_path[0].split(",")
-        for cp in checkpoints:
-            stmt = "select CheckpointID from Checkpoints where CPName=?;"
-            cur.execute(stmt,[cp])
-            cpid = cur.fetchone()
-            path_by_id.append(cpid[0])
-        # print(path_by_id)
-        paths_to_test = path_by_id[:-1]
+        for cp in course_path:
+            path_by_id.append(cp[0])
+        print(path_by_id)
+        paths_to_test = path_by_id[:-1] # remove the finish
 
         # Reverse the path (we want to test from the finish back...but ignore the finish)
         # reverse_path = path_by_id[::-1]
@@ -138,8 +124,8 @@ class Reports:
         last_runner = {}    # {'ParticipantID': x, 'Arrival_Time': y}
         for cp in paths_to_test:
             last_at_cp = {}
-            stmt = "select ParticipantID, max(Sitingtime) from Sitings where CheckpointID=? group by ParticipantID;"
-            cur.execute(stmt,[cp])
+            stmt = "select s.ParticipantID, max(s.Sitingtime) from Sitings s inner join Participants p on s.ParticipantID = p.ParticipantID where s.CheckpointID=? and p.CourseID=? group by s.ParticipantID;"
+            cur.execute(stmt,[cp,courseid])
             participants = cur.fetchall()
             for p in participants:
                 if len(last_at_cp) == 0:
@@ -168,5 +154,5 @@ class Reports:
 
 def show_report():
     r = Reports()
-    r.lead_runner(4)    # find the lead runner for courseID 4 (30K)
-    r.last_runner(4)
+    r.lead_runner(1)    # find the lead runner for courseID 4 (30K)
+    r.last_runner(1)
