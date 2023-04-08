@@ -6,7 +6,7 @@ import tkinter as tk
 from constants import *
 
 class EventsWindow:
-    
+
     def __init__(self,master):
 
         # self.root = tk.Tk()
@@ -28,9 +28,9 @@ class EventsWindow:
         self.imgLogo = ttk.Label(self.root,text="logo placeholder")
         self.imgLogo.grid(row=0,column=0,rowspan=5)
 
-        self.lblID = ttk.Label(self.root,width=10)
-        self.lblID.grid(row=0,column=1, columnspan=2,sticky='w')
-        self.lblID.grid_remove()
+        # self.lblID = ttk.Label(self.root,width=10)
+        # self.lblID.grid(row=0,column=1, columnspan=2,sticky='w')
+        # self.lblID.grid_remove()
 
         self.lblEventName = ttk.Label(self.root,text='Event Name:',width=12)
         self.lblEventName.grid(row=1,column=1,sticky='e', padx=5, pady=8)
@@ -62,7 +62,18 @@ class EventsWindow:
         self.butCancel = ttk.Button(self.root,text='Cancel',command=self.event_cancel)
         self.butCancel.grid(row=4,column=3)
 
+        self.lblID = ttk.Label(self.root,width=10,text='0')
+        self.lblID.grid(row=5,column=3)
+        # self.lblID.grid_remove()
+
+
         self.event_load()
+
+        
+
+    def change_id(self,newText):
+        self.lblID.config(text=newText)
+
 
     def event_load(self):
         """Load the field values from the database"""
@@ -75,12 +86,24 @@ class EventsWindow:
         self.cur.execute(stmt)
         res = self.cur.fetchone()
 
-        sd,st = res[4].split(' ')
+        if res[4]:
+            sd,st = res[4].split(' ')
+        else:
+            sd,st = '',''
+
         # put the data into the fields
-        self.lblID.config(text=res[0])
-        set_text(self.txtEventName,res[1])
-        set_text(self.txtDescription,res[2])
-        set_text(self.txtLocation,res[3])
+        if res[0]:
+            self.lblID.config(text=res[0])
+        
+        if res[1]:
+            set_text(self.txtEventName,res[1])
+
+        if res[2]:
+            set_text(self.txtDescription,res[2])
+
+        if res[3]:
+            set_text(self.txtLocation,res[3])
+        
         set_text(self.txtStartDate,sd)
         set_text(self.txtStartTime,st)
         

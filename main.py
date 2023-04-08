@@ -78,7 +78,7 @@ class MainWindow:
 
 
         filemenu = Menu(mmb, tearoff=0)
-        filemenu.add_command(label="New", command=self.donothing)
+        filemenu.add_command(label="New", command=self.new_click)
         filemenu.add_separator()
         filemenu.add_command(label="Open", command=self.donothing)
         filemenu.add_command(label="Close", command=self.donothing)
@@ -106,12 +106,23 @@ class MainWindow:
         pass
 
     def new_database(self):
+        # display form to collect event information
+        # specify a path/name for the database
+        # create it
+        # open it
         pass
 
+
+    def new_click(self):
+        root = tk.Toplevel()
+        ew = EventsWindow(root)
+        #TODO Clear all the fields and set the ID to 0
+        ew.change_id('0')
     
     def event_click(self):
         root = tk.Toplevel()
         ew = EventsWindow(root)
+        # ew.change_id('9')
 
     def checkpoints_click(self):
         root = tk.Tk()
