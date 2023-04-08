@@ -1,6 +1,9 @@
 # Notes for Marathon Manager
 
 ## TODO
+- [ ] Turn database.py into a CLASS; put all the database access stuff there!
+
+
 - [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)
 - [ ] Store the order of the checkpoints in a course in a paths table
 - [ ] When calculating lead/last or current location, use the path table so everything is linear

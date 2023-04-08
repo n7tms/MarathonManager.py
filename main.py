@@ -116,8 +116,10 @@ class MainWindow:
     def new_click(self):
         root = tk.Toplevel()
         ew = EventsWindow(root)
-        #TODO Clear all the fields and set the ID to 0
+        ew.clear_fields()
         ew.change_id('0')
+        ew.butSave.config(text='Create')
+        ew.txtEventName.focus_set()
     
     def event_click(self):
         root = tk.Toplevel()

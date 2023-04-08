@@ -1,9 +1,12 @@
 # Marathon Manager - Events Window
 
 import sqlite3
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import tkinter as tk
+from tkinter.messagebox import showerror
 from constants import *
+import datetime
+from database import *
 
 class EventsWindow:
 
@@ -73,7 +76,13 @@ class EventsWindow:
 
     def change_id(self,newText):
         self.lblID.config(text=newText)
-
+    
+    def clear_fields(self):
+        self.txtEventName.delete(0,tk.END)
+        self.txtDescription.delete(0,tk.END)
+        self.txtLocation.delete(0,tk.END)
+        self.txtStartDate.delete(0,tk.END)
+        self.txtStartTime.delete(0,tk.END)
 
     def event_load(self):
         """Load the field values from the database"""
@@ -118,12 +127,50 @@ class EventsWindow:
         eTime = self.txtStartTime.get()
         eStart = eDate + ' ' + eTime
 
-        # TODO: Error checking; Do the fields contain valid information
+        # conduct some error checking for valid value formats
+        sError = '' 
+        if len(eName.strip()) < 1:
+            sError += 'Event Name cannot be blank.\n'
+        
+        date_format = '%Y-%m-%d'
+        time_format = '%H:%M'
+        try:
+            eDate = datetime.datetime.strptime(eDate,date_format)
+        except ValueError:
+            sError += 'Start date must be a valid date (yyyy-mm-dd).'
+        
+        try:
+            eTime = datetime.datetime.strptime(eTime,time_format)
+        except ValueError:
+            sError += 'Start time must be a valid time (HH:MM).'
+        
+        if sError:
+            sError = 'Values in one or more fields needs attention.\n\n' + sError
+            showerror(title='MM: Error',message=sError)
 
-        stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
-        res =  self.cur.execute(stmt,(eName,eDescription,eLocation,eStart,eID))
-        self.cn.commit()
-        self.master.destroy()
+        elif eID == '0':    # Create a new event
+            # ask for a path for the new database
+            filetypes = (('database files','*.db'),('All files','*.*'))
+            dbPath = filedialog.asksaveasfilename(title='New Database Path/Name',filetypes=filetypes)
+            
+            # create the database (and tables)
+            if not create_database(dbPath):
+                showerror(title='MM: Error',message='An error occurred while creating the database.')
+            else:
+                cn = sqlite3.connect(dbPath)
+                cur = cn.cursor()
+
+            # insert this event information
+                cur.execute("""INSERT INTO Events (EventName, Description, Location, Starttime) VALUES (?,?,?,?)""",[eName,eDescription,eLocation,eStart])
+                cn.commit()
+
+                self.master.destroy()
+
+        else:               # Update existing event
+            stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
+            res =  self.cur.execute(stmt,(eName,eDescription,eLocation,eStart,eID))
+            self.cn.commit()
+            self.master.destroy()
 
     def event_cancel(self):
         self.master.destroy()
