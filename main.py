@@ -8,21 +8,36 @@ from tkinter import ttk
 
 from checkpoints import *
 from courses import *
-from database import *
-# from events import *
+# from database import *
 from events import *
 from sitings import *
 from participants import *
 from volunteers import *
 from reports import *
+# from database import MMDatabase as DB
+from constants import *
+
+
+class StatusBar(tk.Frame):
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        self.label = tk.Label(self, text='Using: No Database Open', bd=1, relief=SUNKEN)
+        self.label.grid(row=0,column=0,columnspan=5,sticky=W+E, padx=5, pady=8)
+
+    def set(self, newText):
+        self.label.config(text=newText)
+
+    def clear(self):
+        self.label.config(text='')
 
 class MainWindow:
 
     def __init__(self):
         self.root = Tk()
         self.root.title("Marathon Manager")
-        self.root.geometry('450x200')
+        self.root.geometry('450x215')
         self.root.minsize(400,100)
+        self.db = None
 
         # Label(self.root,text="Hello").pack()
 
@@ -44,6 +59,8 @@ class MainWindow:
         btnReports = ttk.Button(self.root,text="Reports",command=self.open_reports)
         btnReports.grid(row=4,column=0,padx=10,pady=10,sticky='news')
 
+        self.status = StatusBar(self.root)
+        self.status.grid(row=10,column=0)
 
         # # Reports/Status
         # reports = guis.reports_status(main_frame)
@@ -80,7 +97,7 @@ class MainWindow:
         filemenu = Menu(mmb, tearoff=0)
         filemenu.add_command(label="New", command=self.new_click)
         filemenu.add_separator()
-        filemenu.add_command(label="Open", command=self.donothing)
+        filemenu.add_command(label="Open", command=self.open_click)
         filemenu.add_command(label="Close", command=self.donothing)
         filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_app)
@@ -121,10 +138,17 @@ class MainWindow:
         ew.butSave.config(text='Create')
         ew.txtEventName.focus_set()
     
+    def open_click(self):
+        filetypes = (('database files','*.db'),('All files','*.*'))
+        dbPath = filedialog.askopenfilename(title='MM: Open Database',filetypes=filetypes)
+        if dbPath:
+            DB.init_db(dbPath)
+            self.status.set('Using: ' + dbPath)
+
+
     def event_click(self):
         root = tk.Toplevel()
         ew = EventsWindow(root)
-        # ew.change_id('9')
 
     def checkpoints_click(self):
         root = tk.Tk()

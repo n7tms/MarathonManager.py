@@ -15,9 +15,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import colorchooser
+from tkinter import filedialog
 from datetime import datetime
 # from PIL import ImageTk, Image
-
+import database as DB
 from main import *
 from constants import *
 
@@ -116,36 +117,29 @@ def messages(main_frame: tk.Frame) -> tk.Frame:
 
 
 def initialize():
-    global cn 
-    global cur
+    # Display a splash screen
+
+    # Open the database
+    filetypes = (('database files','*.db'),('All files','*.*'))
+    dbPath = filedialog.askopenfilename(title='MM: Open Database',filetypes=filetypes)
+    if dbPath:
+        db = DB()
+
+
+
+    # create_database()
     
-    # open the database
-    # # TODO: this needs to be modified to check for valid fields (a db version?)
-    # if not database_exists(DB_NAME_SETTINGS):
-    #     CONN = sqlite3.connect(DB_NAME_SETTINGS)
-    #     CUR = CONN.cursor()
-    #     create_settings_database()
-    #     CONN.close()
+    # cn = sqlite3.connect(DB_NAME)
+    # cur = cn.cursor()
 
-    # if not database_exists(DB_NAME):
-    #     cn = sqlite3.connect(DB_NAME)
-    #     cur = cn.cursor()
-    #     create_database()
-    #     cn.close()
-
-    create_database()
-    
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
-
-    res = cur.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
-    # reslst = list(res)
-    db_version = int(list(res)[0][0])
-    # db_version = 1
-    if db_version < 1:
-        print("Database is an older (incompatible) version. Update.")
-        exit()
-    # print("Using DB Version",db_version)
+    # res = cur.execute("""SELECT SettingValue from Settings WHERE SettingName = 'DBVersion'""")
+    # # reslst = list(res)
+    # db_version = int(list(res)[0][0])
+    # # db_version = 1
+    # if db_version < 1:
+    #     print("Database is an older (incompatible) version. Update.")
+    #     exit()
+    # # print("Using DB Version",db_version)
 
 
 
@@ -154,7 +148,7 @@ def initialize():
 # 
 def main():
     # initialize settings
-    initialize()
+    # initialize()
 
     # Open Main Window
     m = MainWindow()

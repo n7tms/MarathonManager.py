@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter.messagebox import showerror
 from constants import *
 import datetime
-from database import *
 
 class EventsWindow:
 
@@ -21,9 +20,6 @@ class EventsWindow:
         master.title("MM: Events")
         master.geometry('450x200')
         master.minsize(400,100)
-
-        self.cn = sqlite3.connect(DB_NAME)
-        self.cur = self.cn.cursor()
 
 
         # img2 = ImageTk.PhotoImage(file='runner_blue.png')
@@ -92,26 +88,25 @@ class EventsWindow:
             tw.insert(0,text)
 
         stmt = "select EventID, EventName, Description, Location, Starttime from Events;"
-        self.cur.execute(stmt)
-        res = self.cur.fetchone()
+        res = DB.query(stmt)
 
-        if res[4]:
-            sd,st = res[4].split(' ')
+        if res[0]['Starttime']:
+            sd,st = res[0]['Starttime'].split(' ')
         else:
             sd,st = '',''
 
         # put the data into the fields
-        if res[0]:
-            self.lblID.config(text=res[0])
+        if res[0]['EventID']:
+            self.lblID.config(text=res[0]['EventID'])
         
-        if res[1]:
-            set_text(self.txtEventName,res[1])
+        if res[0]['EventName']:
+            set_text(self.txtEventName,res[0]['EventName'])
 
-        if res[2]:
-            set_text(self.txtDescription,res[2])
+        if res[0]['Description']:
+            set_text(self.txtDescription,res[0]['Description'])
 
-        if res[3]:
-            set_text(self.txtLocation,res[3])
+        if res[0]['Location']:
+            set_text(self.txtLocation,res[0]['Location'])
         
         set_text(self.txtStartDate,sd)
         set_text(self.txtStartTime,st)
@@ -154,22 +149,18 @@ class EventsWindow:
             dbPath = filedialog.asksaveasfilename(title='New Database Path/Name',filetypes=filetypes)
             
             # create the database (and tables)
-            if not create_database(dbPath):
+            DB.init_db(dbPath)
+            if not DB.create_database():
                 showerror(title='MM: Error',message='An error occurred while creating the database.')
             else:
-                cn = sqlite3.connect(dbPath)
-                cur = cn.cursor()
-
-            # insert this event information
-                cur.execute("""INSERT INTO Events (EventName, Description, Location, Starttime) VALUES (?,?,?,?)""",[eName,eDescription,eLocation,eStart])
-                cn.commit()
+                # insert this event information
+                DB.nonQuery("""INSERT INTO Events (EventName, Description, Location, Starttime) VALUES (?,?,?,?)""",[eName,eDescription,eLocation,eStart])
 
                 self.master.destroy()
 
         else:               # Update existing event
             stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
-            res =  self.cur.execute(stmt,(eName,eDescription,eLocation,eStart,eID))
-            self.cn.commit()
+            DB.nonQuery(stmt,[eName,eDescription,eLocation,eStart,eID])
             self.master.destroy()
 
     def event_cancel(self):
