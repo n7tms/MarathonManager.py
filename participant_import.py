@@ -20,7 +20,6 @@
 # distance	Firstname	Lastname	gender	Age	DOB	Email	Address	City	State	Zip	Country	Phone	Bib	ename	ephone
 
 
-import sqlite3
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
@@ -40,10 +39,6 @@ class ImportParticipantsWindow():
 
         master.title("MM: Import Participants")
         master.geometry('1000x600')
-
-        self.cn = sqlite3.connect(DB_NAME)
-        self.cur = self.cn.cursor()
-
 
         # TODO fix this grid layout; all of the widgets are misaligned
         self.title = ttk.Label(self.root,text='Participant Import',font=('Arial',18))
@@ -129,11 +124,10 @@ class ImportParticipantsWindow():
 
         # Get a list of courseID's into a dictionary for quick reference.
         stmt = """select CourseID, CourseName from Courses;"""
-        self.cur.execute(stmt)
-        rows = self.cur.fetchall()
+        rows = DB.query(stmt)
         course_info = {}
         for row in rows:
-            course_info[row[1]] = row[0]
+            course_info[row['CourseName']] = row['CourseID']
 
         for x in data:
             # TODO does the bib already exist? If so, "update" data
@@ -144,10 +138,8 @@ class ImportParticipantsWindow():
             # insert this participant into the Participants table
             stmt = """insert into Participants (CourseID,Bib,Firstname,Lastname,Gender,Age,Email,Phone,Birthdate,Street1,City,State,Zipcode,Country,EContactName,EContactPhone) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"""
-            self.cur.execute(stmt,tuple(x[1:]))
+            DB.nonQuery(stmt,tuple(x[1:]))
 
-        # commit all of the inserts at the same time
-        self.cn.commit()
 
         # TODO include the count of inserted records and collisions
         messagebox.showinfo(message='Import complete.')
