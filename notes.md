@@ -1,16 +1,18 @@
 # Notes for Marathon Manager
 
 ## TODO
+- [ ] Turn database.py into a CLASS; put all the database access stuff there!
+
+
+- [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)
+- [ ] Store the order of the checkpoints in a course in a paths table
+- [ ] When calculating lead/last or current location, use the path table so everything is linear
+
+
 - [ ] Create the edit siting window and function
 - [ ] need to make sure tick (and quotes?) are not used in queries.
-
-- [x] add horizontal and vertical scrollbars on the courses window
-- [x] Add a participant
-- [x] Add right-click function to participant treeview
-- [ ] Import participants (uses add fn)
 - [ ] Modify participant table to handle teams (relay)
 
-- [ ] Add volunteer
 - [ ] Import vol from csv 
 - [ ] Import vol from other db
 - [ ] Export vol to csv/db file
@@ -28,8 +30,16 @@
 - [ ] Map checkpoints
 - [ ] Map runners
 
+- [ ] Put more detail in the README.md file
+
+
 - [x] Modify checkpoint code to deal with actual location
 - [x] Is it possible to hide a CheckpointID in the cmbCheckpoint element?
+- [x] add horizontal and vertical scrollbars on the courses window
+- [x] Add a participant
+- [x] Add right-click function to participant treeview
+- [x] Import participants (uses add fn)
+- [x] Add volunteer
 
 
 

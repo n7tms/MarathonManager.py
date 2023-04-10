@@ -1,12 +1,14 @@
 # Marathon Manager - Events Window
 
 import sqlite3
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import tkinter as tk
+from tkinter.messagebox import showerror
 from constants import *
+import datetime
 
 class EventsWindow:
-    
+
     def __init__(self,master):
 
         # self.root = tk.Tk()
@@ -19,18 +21,15 @@ class EventsWindow:
         master.geometry('450x200')
         master.minsize(400,100)
 
-        self.cn = sqlite3.connect(DB_NAME)
-        self.cur = self.cn.cursor()
-
 
         # img2 = ImageTk.PhotoImage(file='runner_blue.png')
         # imgLogo = ttk.Label(main_frame,image=img2)
         self.imgLogo = ttk.Label(self.root,text="logo placeholder")
         self.imgLogo.grid(row=0,column=0,rowspan=5)
 
-        self.lblID = ttk.Label(self.root,width=10)
-        self.lblID.grid(row=0,column=1, columnspan=2,sticky='w')
-        self.lblID.grid_remove()
+        # self.lblID = ttk.Label(self.root,width=10)
+        # self.lblID.grid(row=0,column=1, columnspan=2,sticky='w')
+        # self.lblID.grid_remove()
 
         self.lblEventName = ttk.Label(self.root,text='Event Name:',width=12)
         self.lblEventName.grid(row=1,column=1,sticky='e', padx=5, pady=8)
@@ -62,7 +61,24 @@ class EventsWindow:
         self.butCancel = ttk.Button(self.root,text='Cancel',command=self.event_cancel)
         self.butCancel.grid(row=4,column=3)
 
+        self.lblID = ttk.Label(self.root,width=10,text='0')
+        self.lblID.grid(row=5,column=3)
+        # self.lblID.grid_remove()
+
+
         self.event_load()
+
+        
+
+    def change_id(self,newText):
+        self.lblID.config(text=newText)
+    
+    def clear_fields(self):
+        self.txtEventName.delete(0,tk.END)
+        self.txtDescription.delete(0,tk.END)
+        self.txtLocation.delete(0,tk.END)
+        self.txtStartDate.delete(0,tk.END)
+        self.txtStartTime.delete(0,tk.END)
 
     def event_load(self):
         """Load the field values from the database"""
@@ -72,15 +88,26 @@ class EventsWindow:
             tw.insert(0,text)
 
         stmt = "select EventID, EventName, Description, Location, Starttime from Events;"
-        self.cur.execute(stmt)
-        res = self.cur.fetchone()
+        res = DB.query(stmt)
 
-        sd,st = res[4].split(' ')
+        if res[0]['Starttime']:
+            sd,st = res[0]['Starttime'].split(' ')
+        else:
+            sd,st = '',''
+
         # put the data into the fields
-        self.lblID.config(text=res[0])
-        set_text(self.txtEventName,res[1])
-        set_text(self.txtDescription,res[2])
-        set_text(self.txtLocation,res[3])
+        if res[0]['EventID']:
+            self.lblID.config(text=res[0]['EventID'])
+        
+        if res[0]['EventName']:
+            set_text(self.txtEventName,res[0]['EventName'])
+
+        if res[0]['Description']:
+            set_text(self.txtDescription,res[0]['Description'])
+
+        if res[0]['Location']:
+            set_text(self.txtLocation,res[0]['Location'])
+        
         set_text(self.txtStartDate,sd)
         set_text(self.txtStartTime,st)
         
@@ -95,12 +122,46 @@ class EventsWindow:
         eTime = self.txtStartTime.get()
         eStart = eDate + ' ' + eTime
 
-        # TODO: Error checking; Do the fields contain valid information
+        # conduct some error checking for valid value formats
+        sError = '' 
+        if len(eName.strip()) < 1:
+            sError += 'Event Name cannot be blank.\n'
+        
+        date_format = '%Y-%m-%d'
+        time_format = '%H:%M'
+        try:
+            eDate = datetime.datetime.strptime(eDate,date_format)
+        except ValueError:
+            sError += 'Start date must be a valid date (yyyy-mm-dd).'
+        
+        try:
+            eTime = datetime.datetime.strptime(eTime,time_format)
+        except ValueError:
+            sError += 'Start time must be a valid time (HH:MM).'
+        
+        if sError:
+            sError = 'Values in one or more fields needs attention.\n\n' + sError
+            showerror(title='MM: Error',message=sError)
 
-        stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
-        res =  self.cur.execute(stmt,(eName,eDescription,eLocation,eStart,eID))
-        self.cn.commit()
-        self.master.destroy()
+        elif eID == '0':    # Create a new event
+            # ask for a path for the new database
+            filetypes = (('database files','*.db'),('All files','*.*'))
+            dbPath = filedialog.asksaveasfilename(title='New Database Path/Name',filetypes=filetypes)
+            
+            # create the database (and tables)
+            DB.init_db(dbPath)
+            if not DB.create_database():
+                showerror(title='MM: Error',message='An error occurred while creating the database.')
+            else:
+                # insert this event information
+                DB.nonQuery("""INSERT INTO Events (EventName, Description, Location, Starttime) VALUES (?,?,?,?)""",[eName,eDescription,eLocation,eStart])
+
+                self.master.destroy()
+
+        else:               # Update existing event
+            stmt = "update Events set EventName=?,Description=?,Location=?,Starttime=? where EventID=?"
+            DB.nonQuery(stmt,[eName,eDescription,eLocation,eStart,eID])
+            self.master.destroy()
 
     def event_cancel(self):
         self.master.destroy()
