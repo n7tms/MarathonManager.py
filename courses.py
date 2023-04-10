@@ -79,6 +79,9 @@ def course_edit(item,tv):
             else:
                 # something went wrong (eg. invalid checkpoint, probably)
                 DB.nonQuery("delete from Courses where CourseID=?",[new_idx[0]['lir']])
+        else:
+            courses_filldata(tv)
+            c_root.destroy()
 
 
     def update():

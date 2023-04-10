@@ -119,7 +119,7 @@ class ImportParticipantsWindow():
         """write the data in the treeview to the database"""
         data = []
         for x in tv.get_children():
-            print(tv.item(x)['values'][1:])
+            # print(tv.item(x)['values'][1:])
             data.append(tv.item(x)['values'][1:])
 
         # Get a list of courseID's into a dictionary for quick reference.
@@ -143,6 +143,8 @@ class ImportParticipantsWindow():
 
         # TODO include the count of inserted records and collisions
         messagebox.showinfo(message='Import complete.')
+        self.master.destroy() 
+
 
 
     def import_edit_row(self,tv:ttk.Treeview) -> None:
@@ -203,4 +205,4 @@ class ImportParticipantsWindow():
 
     def import_cancel(self):
         """Cancel everything and close this window"""
-        self.master.destroy()
+        self.master.destroy() 

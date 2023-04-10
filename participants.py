@@ -19,9 +19,6 @@ class ParticipantsWindow:
         master.geometry('800x600')
         master.minsize(400,100)
 
-        # self.cn = sqlite3.connect(DB_NAME)
-        # self.cur = self.cn.cursor()
-
 
         self.title = ttk.Label(self.root,text='Participants',font=('Arial',18))
         self.title.grid(row=0,column=0,columnspan=2,sticky='nw')
@@ -75,23 +72,23 @@ class ParticipantsWindow:
 
 
     def showContextMenu(self,event):
-        iid = tvParticipants.identify('item',event.x,event.y)
+        iid = self.tvParticipants.identify('item',event.x,event.y)
 
         def p_e_r():
-            item = int(tvParticipants.item(tvParticipants.focus(),"values")[0])
-            participant_edit(item,tvParticipants)
+            item = int(self.tvParticipants.item(self.tvParticipants.focus(),"values")[0])
+            self.participant_edit(item,self.tvParticipants)
 
         def participant_delete():
             print("Participant delete not yet implemented.")
         
 
         if iid:
-            tvParticipants.selection_set(iid)
-            tvParticipants.focus_set()
-            tvParticipants.focus(iid)
+            self.tvParticipants.selection_set(iid)
+            self.tvParticipants.focus_set()
+            self.tvParticipants.focus(iid)
 
             # Treeview right-click popup menu definition
-            context_menu = tk.Menu(main_frame,tearoff=0)
+            context_menu = tk.Menu(self.master,tearoff=0)
             context_menu.add_command(label="Edit",command=p_e_r)
             context_menu.add_separator()
             context_menu.add_command(label="Delete",command=participant_delete)
@@ -117,26 +114,21 @@ class ParticipantsWindow:
             tv.delete(item)
 
         # get the checkpoints from the database
-        # cn = sqlite3.connect(DB_NAME)
-        # cur = cn.cursor()
 
         # This SQL statement retrieves all of the participants regardless if a courseid has been assigned.
-        cur.execute("select ParticipantID, Lastname || ', ' || Firstname as Name, c.CourseID, CourseName, Bib from Participants as p LEFT JOIN Courses as c ON p.CourseID=c.CourseID;")
-        rows = cur.fetchall()
+        rows = DB.query("select ParticipantID, Lastname || ', ' || Firstname as Name, c.CourseID, CourseName, Bib from Participants as p LEFT JOIN Courses as c ON p.CourseID=c.CourseID;")
         for row in rows:
-            tv.insert("",tk.END,values=row)
+            tv.insert("",tk.END,values=[row['ParticipantID'],row['Name'],row['CourseID'],row['CourseName'],row['Bib']])
 
 
     def participant_edit(self,pid=None,tv=None):
-        # cn = sqlite3.connect(DB_NAME)
-        # cur = cn.cursor()
         textable_var = tk.StringVar()
         gender_var = tk.StringVar()
 
         if pid:
-            cur.execute("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, CourseID, Bib from Participants where ParticipantID=?",[pid])
-            row = cur.fetchone()
-            fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib = list(row)
+            row = DB.query("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, CourseID, Bib from Participants where ParticipantID=?",[pid])
+            fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib = row[0].values()
+            print(fname)
         else:
             fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib = list([''] * 16)
             textable = 0
@@ -149,8 +141,6 @@ class ParticipantsWindow:
 
         def save():
             """Create/insert a new participant"""
-            # cn = sqlite3.connect(DB_NAME)
-            # cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()
@@ -169,18 +159,15 @@ class ParticipantsWindow:
             cid = txtCID.get()
             bib = txtBib.get()
 
-            cur.execute("""insert into Participants (Firstname, Lastname, Gender, Birthdate, Phone, 
+            DB.nonQuery("""insert into Participants (Firstname, Lastname, Gender, Birthdate, Phone, 
             Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, 
             CourseID, Bib) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""",[fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib])
-            cn.commit()
 
             self.participants_filldata(tv)
             croot.destroy()
 
         def update():
             """Update an existing Participant"""
-            # cn = sqlite3.connect(DB_NAME)
-            # cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()
@@ -199,11 +186,10 @@ class ParticipantsWindow:
             cid = txtCID.get()
             bib = txtBib.get()
 
-            cur.execute("""update Participants set Firstname=?, Lastname=?, Gender=?, Birthdate=?, 
+            DB.nonQuery("""update Participants set Firstname=?, Lastname=?, Gender=?, Birthdate=?, 
             Phone=?, Textable=?, Email=?, Street1=?, Street2=?, City=?, State=?, Zipcode=?, 
             EContactName=?, EContactPhone=?, CourseID=?, Bib=? where ParticipantID=?""",
             [fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib,pid])
-            cn.commit()
 
             self.participants_filldata(tv)
             croot.destroy()
