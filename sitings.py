@@ -100,7 +100,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
                 partID = res[0]['ParticipantID']
 
                 # add the siting to the sitings table
-                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "');"
+                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M") + "');"
                 res =  DB.nonQuery(stmt)
 
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")
