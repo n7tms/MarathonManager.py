@@ -5,7 +5,6 @@
 
 
 
-import sqlite3
 from pathlib import Path
 from tkinter import ttk
 import tkinter as tk
@@ -21,7 +20,6 @@ from constants import *
 # =============================================================================
 
 def siting_window(main_frame: tk.Frame) -> tk.Frame:
-    cn,cur = None,None
     checkpoints = {}
     after_id = ''
 
@@ -29,22 +27,21 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         for item in tv.get_children():
             tv.delete(item)
         
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
-        cur.execute("select s.SitingID, s.SitingTime, c.CPName, pa.ParticipantID,pa.Bib || ' ' || pa.Firstname || ' ' || pa.Lastname from Sitings as s, Checkpoints as c, Participants as pa where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID order by s.SitingTime DESC;")
-        rows = cur.fetchall()
+        stmt = "select s.SitingID, s.SitingTime, c.CPName, pa.ParticipantID,pa.Bib || ' ' || pa.Firstname || ' ' || pa.Lastname as BibName from Sitings as s, Checkpoints as c, Participants as pa where s.CheckpointID=c.CheckpointID and s.ParticipantID=pa.ParticipantID order by s.SitingTime DESC;"
+        rows = DB.query(stmt)
 
         for row in rows:
-            tv.insert("",'end',values=row,tags=str(row[0]))
+            rowvalues = (row['SitingID'], row['Sitingtime'], row['CPName'], row['ParticipantID'], row['BibName'])
+            tv.insert("",'end',values=rowvalues,tags=str(row['SitingID']))
 
     def get_checkpoints() -> list:
         """return a list of checkpoints"""
         if len(checkpoints) > 0:
             checkpoints.clear()
 
-        res = cur.execute("select CheckpointID,CPName from Checkpoints")
+        res = DB.query("select CheckpointID,CPName from Checkpoints")
         for x in res:
-            checkpoints[x[1]] = x[0]
+            checkpoints[x["CPName"]] = x["CheckpointID"]
         
         return list(checkpoints.keys()) 
 
@@ -90,23 +87,22 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
             for b in bibs:
                 # check if bib exists in the database; add it if it doesn't
                 partID = -1
-                stmt = "select ParticipantID from Participants where Bib=" + b + ";"
-                res = list(cur.execute(stmt))
+                stmt = """select ParticipantID from Participants where Bib=?"""
+                res = DB.query(stmt,[b])
                 if len(res) == 0:
                     # add the bib to Participants
-                    stmt = "insert into Participants (EventID,Firstname,Lastname,RaceID,Bib) values (1,'','',0," + b + ");"
-                cur.execute(stmt)
-                cn.commit()
+                    stmt = "insert into Participants (EventID,Firstname,Lastname,RaceID,Bib) values (1,'','',0,?);"
+                    DB.nonQuery(stmt,[b])
 
                 # get the participantID belonging to this bib
-                stmt = "select ParticipantID from Participants where Bib=" + b + ";"
-                res = list(cur.execute(stmt))
-                partID = res[0][0]
+                stmt = "select ParticipantID from Participants where Bib=?;"
+                # res = list(cur.execute(stmt))
+                res = DB.query(stmt,[b])
+                partID = res[0]['ParticipantID']
 
                 # add the siting to the sitings table
                 stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "');"
-                res =  cur.execute(stmt)
-            cn.commit()
+                res =  DB.nonQuery(stmt)
 
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")
 
@@ -144,8 +140,6 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
 
     # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
 
     lblTime = ttk.Label(main_frame,width=10,background='#ffffff')
     lblTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
