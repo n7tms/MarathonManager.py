@@ -1,7 +1,10 @@
 # Notes for Marathon Manager
 
 ## TODO
-- [ ] Turn database.py into a CLASS; put all the database access stuff there!
+- [x] Turn database.py into a CLASS; put all the database access stuff there!
+- [ ] Fix sitings to deal with the new database class
+- [ ] incorporate a history in the file menu
+- [ ] 
 
 
 - [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)
