@@ -24,9 +24,6 @@ class VolunteersWindow():
         master.title("MM: Volunteers")
         master.geometry('550x400')
 
-        self.cn = sqlite3.connect(DB_NAME)
-        self.cur = self.cn.cursor()
-
         self.title = ttk.Label(self.root,text='Volunteers',font=('Arial',18))
         self.title.grid(row=0,column=0,columnspan=2,sticky='nw')
 
@@ -71,13 +68,9 @@ class VolunteersWindow():
             tv.delete(item)
 
         # get the checkpoints from the database
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
-
-        cur.execute("select VolunteerID, Lastname || ', ' || Firstname as Name, Callsign, 0 from Volunteers order by Lastname;")
-        rows = cur.fetchall()
+        rows = DB.query("select VolunteerID, Lastname || ', ' || Firstname as Name, Callsign, 0 from Volunteers order by Lastname;")
         for row in rows:
-            tv.insert("",tk.END,values=row)
+            tv.insert("",tk.END,values=list(row.values()))
 
 
 
@@ -100,15 +93,12 @@ class VolunteersWindow():
     
     def volunteer_edit(self,vid=None,tv=None):
         pass
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
         textable_var = tk.StringVar()
         gender_var = tk.StringVar()
 
         if vid:
-            cur.execute("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, Callsign, Username, Password, Permission from Volunteers where VolunteerID=?",[vid])
-            row = cur.fetchone()
-            fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,callsign,username,password,permission = list(row)
+            row = DB.query("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, Callsign, Username, Password, Permission from Volunteers where VolunteerID=?",[vid])
+            fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,callsign,username,password,permission = list(row[0].values())
         else:
             fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,callsign,username,password,permission = list([''] * 18)
             textable = 0
@@ -119,8 +109,6 @@ class VolunteersWindow():
 
         def save():
             """Create/insert a new participant"""
-            cn = sqlite3.connect(DB_NAME)
-            cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()
@@ -141,18 +129,15 @@ class VolunteersWindow():
             password = txtPassword.get()
             permission = txtPermission.get()
 
-            cur.execute("""insert into Volunteers (Firstname, Lastname, Gender, Birthdate, Phone, 
+            DB.nonQuery("""insert into Volunteers (Firstname, Lastname, Gender, Birthdate, Phone, 
             Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, 
             Callsign, Username, Password, Permission) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""",[fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,callsign,username,password,permission])
-            cn.commit()
 
             self.volunteers_filldata(tv)
             vroot.destroy()
 
         def update():
             """Update an existing Participant"""
-            cn = sqlite3.connect(DB_NAME)
-            cur = cn.cursor()
 
             fname = txtFName.get()
             lname = txtLName.get()
@@ -174,11 +159,10 @@ class VolunteersWindow():
             permission = txtPermission.get()
 
 
-            cur.execute("""update Volunteers set Firstname=?, Lastname=?, Gender=?, Birthdate=?, 
+            DB.nonQuery("""update Volunteers set Firstname=?, Lastname=?, Gender=?, Birthdate=?, 
             Phone=?, Textable=?, Email=?, Street1=?, Street2=?, City=?, State=?, Zipcode=?, 
             EContactName=?, EContactPhone=?, Callsign=?, Username=?, Password=?, Permission=? where VolunteerID=?""",
             [fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,callsign,username,password,permission,vid])
-            cn.commit()
 
             self.volunteers_filldata(tv)
             vroot.destroy()

@@ -17,8 +17,6 @@ def courses_filldata(tv:ttk.Treeview) -> None:
         tv.delete(item)
 
     # get the courses from the database
-    # cn = sqlite3.connect(DB_NAME)
-    # cur = cn.cursor()
     rows = DB.query("select CourseID, CourseName, Distance, Color, Path from Courses;")
     
     # populate the treeview with the data

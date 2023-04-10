@@ -20,12 +20,9 @@ def checkpoint_filldata(tv:ttk.Treeview) -> None:
         tv.delete(item)
 
     # get the checkpoints from the database
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
-    cur.execute("select CheckpointID, CPName, Description, Longitude, Latitude from Checkpoints;")
-    rows = cur.fetchall()
+    rows = DB.query("select CheckpointID, CPName, Description, Longitude, Latitude from Checkpoints;")
     for row in rows:
-        tv.insert("",tk.END,values=row)
+        tv.insert("",tk.END,values=list(row.values()))
 
 def checkpoint_edit(checkpoint,tv):
     if checkpoint:
@@ -38,32 +35,25 @@ def checkpoint_edit(checkpoint,tv):
 
     def save():
         """Create/insert a new Checkpoint"""
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
 
         cpid = txtCPID.get()
         cname=txtName.get()
         cdescription = txtDescr.get()
         clong = txtLong.get()
         clat = txtLat.get()
-        cur.execute("insert into Checkpoints (CPName, Description, Longitude, Latitude) values(?,?,?,?);",[cname,cdescription,clong,clat])
-        cn.commit()
+        DB.nonQuery("insert into Checkpoints (CPName, Description, Longitude, Latitude) values(?,?,?,?);",[cname,cdescription,clong,clat])
 
         checkpoint_filldata(tv)
         croot.destroy()
 
     def update():
         """Update an existing Checkpoint"""
-        cn = sqlite3.connect(DB_NAME)
-        cur = cn.cursor()
-
         cpid = txtCPID.get()
         cname=txtName.get()
         cdescription = txtDescr.get()
         clong = txtLong.get()
         clat = txtLat.get()
-        cur.execute("update Checkpoints set CPName=?, Description=?, Longitude=?, Latitude=? where CheckpointID=?",[cname,cdescription,clong,clat,cpid])
-        cn.commit()
+        DB.nonQuery("update Checkpoints set CPName=?, Description=?, Longitude=?, Latitude=? where CheckpointID=?",[cname,cdescription,clong,clat,cpid])
 
         checkpoint_filldata(tv)
         croot.destroy()
@@ -116,11 +106,6 @@ def checkpoint_edit(checkpoint,tv):
 
 
 def checkpoint_window(main_frame:tk.Frame) -> tk.Frame:
-    cn,cur = None,None
-
-    cn = sqlite3.connect(DB_NAME)
-    cur = cn.cursor()
-
 
     def checkpoint_close():
         main_frame.destroy()
