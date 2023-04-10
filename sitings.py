@@ -91,17 +91,16 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
                 res = DB.query(stmt,[b])
                 if len(res) == 0:
                     # add the bib to Participants
-                    stmt = "insert into Participants (EventID,Firstname,Lastname,RaceID,Bib) values (1,'','',0,?);"
+                    stmt = "insert into Participants (EventID,Firstname,Lastname,CourseID,Bib) values (1,'','',0,?);"
                     DB.nonQuery(stmt,[b])
 
                 # get the participantID belonging to this bib
                 stmt = "select ParticipantID from Participants where Bib=?;"
-                # res = list(cur.execute(stmt))
                 res = DB.query(stmt,[b])
                 partID = res[0]['ParticipantID']
 
                 # add the siting to the sitings table
-                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "');"
+                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M") + "');"
                 res =  DB.nonQuery(stmt)
 
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")

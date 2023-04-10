@@ -1,7 +1,7 @@
 # Notes for Marathon Manager
 
 ## TODO
-- [ ] Turn database.py into a CLASS; put all the database access stuff there!
+- [ ] 
 
 
 - [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)
@@ -40,6 +40,9 @@
 - [x] Add right-click function to participant treeview
 - [x] Import participants (uses add fn)
 - [x] Add volunteer
+- [x] Turn database.py into a CLASS; put all the database access stuff there!
+- [x] Fix sitings to deal with the new database class
+- [x] incorporate a history in the file menu
 
 
 
