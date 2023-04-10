@@ -2,8 +2,8 @@
 
 ## TODO
 - [x] Turn database.py into a CLASS; put all the database access stuff there!
-- [ ] Fix sitings to deal with the new database class
-- [ ] incorporate a history in the file menu
+- [x] Fix sitings to deal with the new database class
+- [x] incorporate a history in the file menu
 - [ ] 
 
 

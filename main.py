@@ -16,6 +16,8 @@ from volunteers import *
 from reports import *
 # from database import MMDatabase as DB
 from constants import *
+import os.path
+from functools import partial
 
 
 class StatusBar(tk.Frame):
@@ -35,7 +37,7 @@ class MainWindow:
     def __init__(self):
         self.root = Tk()
         self.root.title("Marathon Manager")
-        self.root.geometry('450x215')
+        self.root.geometry('450x225')
         self.root.minsize(400,100)
         self.db = None
 
@@ -100,6 +102,18 @@ class MainWindow:
         filemenu.add_command(label="Open", command=self.open_click)
         filemenu.add_command(label="Close", command=self.donothing)
         filemenu.add_separator()
+        # History
+        # TODO iterate through the history file and add menu options for the most recent 3
+        history = []
+        if os.path.exists('histfile.mm'):
+            with open('histfile.mm','r') as f:
+                history = [(line) for line in f.read().split('\n')]
+                for i,h in enumerate(history):
+                    if h:
+                        hname,hpath = h.split(",")
+                        filemenu.add_command(label=hname, command=partial(self.history_click, i))
+
+        filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.exit_app)
         mmb.add_cascade(label="File", menu=filemenu) 
 
@@ -144,6 +158,38 @@ class MainWindow:
         if dbPath:
             DB.init_db(dbPath)
             self.status.set('Using: ' + dbPath)
+        self.update_history(dbPath)
+
+
+    def history_click(self,idx):
+        out = []
+        if os.path.exists('histfile.mm'):
+            with open('histfile.mm','r') as f:
+                out = [(line) for line in f.read().split('\n')]
+            
+                hname,hpath = out[idx].split(",")
+                DB.init_db(hpath)
+                self.status.set('Using: ' + hpath)
+
+
+    def update_history(self,filepath):
+        # read current history file into nested list
+        # open the filepath db and read the event name
+        # insert the event name and filepath in pos 0 of history list
+        # write the first 3 items back to the history file
+        out = []
+        if os.path.exists('histfile.mm'):
+            with open('histfile.mm','r') as f:
+                out = [(line) for line in f.read().split('\n')]
+
+        res = DB.query('select EventName from Events')
+        eventname = res[0]['EventName']
+
+        out.insert(0,f'{eventname},{filepath}')
+        with open('histfile.mm','w') as f:
+            for e in out[:3]:
+                f.writelines(e + '\n')
+        f.close()
 
 
     def event_click(self):
