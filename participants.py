@@ -1,6 +1,5 @@
 # Marathon Manager - Participants Window
 
-import sqlite3
 from tkinter import ttk
 import tkinter as tk
 from constants import *
