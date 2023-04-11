@@ -1,6 +1,7 @@
 # Notes for Marathon Manager
 
 ## TODO
+- [ ] Fix checkboxes on Participant form
 - [ ] 
 
 

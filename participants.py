@@ -5,6 +5,7 @@ from tkinter import ttk
 import tkinter as tk
 from constants import *
 from participant_import import *
+from functools import partial
 
 class ParticipantsWindow:
     
@@ -57,6 +58,7 @@ class ParticipantsWindow:
         self.btnClose = ttk.Button(self.root,text="Close",command=self.participants_close)
         self.btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
+        self.part_gender = ""
 
     def participants_close(self):
         self.master.destroy()
@@ -124,6 +126,9 @@ class ParticipantsWindow:
     def participant_edit(self,pid=None,tv=None):
         textable_var = tk.StringVar()
         gender_var = tk.StringVar()
+        # genderM_var = tk.StringVar()
+        # genderF_var = tk.StringVar()
+        # genderO_var = tk.StringVar()
 
         if pid:
             row = DB.query("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, CourseID, Bib from Participants where ParticipantID=?",[pid])
@@ -144,7 +149,7 @@ class ParticipantsWindow:
 
             fname = txtFName.get()
             lname = txtLName.get()
-            gender = gender_var.get()
+            gender = self.part_gender
             bday = txtBday.get()
             phone = txtPhone.get()
             textable = int(textable_var.get())
@@ -171,7 +176,7 @@ class ParticipantsWindow:
 
             fname = txtFName.get()
             lname = txtLName.get()
-            gender = gender_var.get()
+            gender = self.part_gender
             bday = txtBday.get()
             phone = txtPhone.get()
             textable = int(textable_var.get())
@@ -218,17 +223,24 @@ class ParticipantsWindow:
         txtLName.grid(row=1,column=4,columnspan=2,sticky='w')
         txtLName.insert(0,lname)
 
-        def gender_selected():
-            tk.messagebox.showinfo(title="Gender",message=gender_var.get())
+        def gender_selected(arg):
+            self.part_gender = arg
+            # tk.messagebox.showinfo(title="Gender",message=part_gender)
         
-        gender_f = tk.Radiobutton(croot, text='Female',variable=gender_var, value='F')
-        gender_m = tk.Radiobutton(croot, text='Male',variable=gender_var, value='M')
-        gender_o = tk.Radiobutton(croot, text='Other',variable=gender_var, value='O')
+
+        gender_f = tk.Radiobutton(croot, text='Female',variable=gender_var, value='F',command=partial(gender_selected,'F'))
+        gender_m = tk.Radiobutton(croot, text='Male',variable=gender_var, value='M',command=partial(gender_selected,'M'))
+        gender_o = tk.Radiobutton(croot, text='Other',variable=gender_var, value='O',command=partial(gender_selected,'O'))
         gender_f.grid(row=2,column=0,sticky='w')
         gender_m.grid(row=2,column=1,sticky='w')
         gender_o.grid(row=2,column=2,sticky='w')
-        # gender_var.set(gender)
-        gender_f.invoke()
+        if gender == 'F':
+            gender_f.invoke()
+        elif gender == 'M':
+            gender_m.invoke()
+        else:
+            gender_o.invoke()
+            
 
         lblBday = ttk.Label(croot,text="Birthdate:")
         lblBday.grid(row=3,column=0,sticky='e')
