@@ -59,6 +59,7 @@ class ParticipantsWindow:
         self.btnClose.grid(row=3,column=2,padx=5,pady=5,sticky='w')
 
         self.part_gender = ""
+        self.part_textable = 0
 
     def participants_close(self):
         self.master.destroy()
@@ -124,16 +125,13 @@ class ParticipantsWindow:
 
 
     def participant_edit(self,pid=None,tv=None):
-        textable_var = tk.StringVar()
-        gender_var = tk.StringVar()
-        # genderM_var = tk.StringVar()
-        # genderF_var = tk.StringVar()
-        # genderO_var = tk.StringVar()
+        self.textable_var = tk.IntVar()
+        self.gender_var = tk.StringVar()
 
         if pid:
             row = DB.query("select Firstname, Lastname, Gender, Birthdate, Phone, Textable, Email, Street1, Street2, City, State, Zipcode, EContactName, EContactPhone, CourseID, Bib from Participants where ParticipantID=?",[pid])
             fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib = row[0].values()
-            print(fname)
+            # print(fname)
         else:
             fname,lname,gender,bday,phone,textable,email,street1,street2,city,state,zipcode,ename,ephone,cid,bib = list([''] * 16)
             textable = 0
@@ -152,7 +150,10 @@ class ParticipantsWindow:
             gender = self.part_gender
             bday = txtBday.get()
             phone = txtPhone.get()
-            textable = int(textable_var.get())
+            if 'selected' in chkTextable.state():
+                textable = 1
+            else:
+                textable = 0
             email = txtEmail.get()
             street1 = txtStreet1.get()
             street2 = txtStreet2.get()
@@ -179,7 +180,10 @@ class ParticipantsWindow:
             gender = self.part_gender
             bday = txtBday.get()
             phone = txtPhone.get()
-            textable = int(textable_var.get())
+            if 'selected' in chkTextable.state():
+                textable = 1
+            else:
+                textable = 0
             email = txtEmail.get()
             street1 = txtStreet1.get()
             street2 = txtStreet2.get()
@@ -225,12 +229,10 @@ class ParticipantsWindow:
 
         def gender_selected(arg):
             self.part_gender = arg
-            # tk.messagebox.showinfo(title="Gender",message=part_gender)
-        
 
-        gender_f = tk.Radiobutton(croot, text='Female',variable=gender_var, value='F',command=partial(gender_selected,'F'))
-        gender_m = tk.Radiobutton(croot, text='Male',variable=gender_var, value='M',command=partial(gender_selected,'M'))
-        gender_o = tk.Radiobutton(croot, text='Other',variable=gender_var, value='O',command=partial(gender_selected,'O'))
+        gender_f = tk.Radiobutton(croot, text='Female',variable=self.gender_var, value='F',command=partial(gender_selected,'F'))
+        gender_m = tk.Radiobutton(croot, text='Male',variable=self.gender_var, value='M',command=partial(gender_selected,'M'))
+        gender_o = tk.Radiobutton(croot, text='Other',variable=self.gender_var, value='O',command=partial(gender_selected,'O'))
         gender_f.grid(row=2,column=0,sticky='w')
         gender_m.grid(row=2,column=1,sticky='w')
         gender_o.grid(row=2,column=2,sticky='w')
@@ -256,12 +258,14 @@ class ParticipantsWindow:
         if phone:
             txtPhone.insert(0,phone)
 
-        chkTextable = tk.Checkbutton(croot,text="Texable",variable=textable_var,onvalue="1",offvalue="0")
+        chkTextable = ttk.Checkbutton(croot,text="Textable")
         chkTextable.grid(row=4,column=3,sticky='w')
         if textable:
-            textable_var.set(str(textable))
+            chkTextable.state(['!alternate'])
+            chkTextable.state(['selected'])
         else:
-            textable_var.set("0")
+            chkTextable.state(['!alternate'])
+            chkTextable.state(['!selected'])
 
         lblEmail = ttk.Label(croot,text="Email:")
         lblEmail.grid(row=5,column=0,sticky='e')
