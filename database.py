@@ -102,6 +102,7 @@ class MMDatabase:
                 EventID	INTEGER,
                 CourseID INTEGER,
                 Bib	INTEGER,
+                Team TEXT,
                 PRIMARY KEY(ParticipantID AUTOINCREMENT)
             )"""
         self.cur.execute(sStmt)
