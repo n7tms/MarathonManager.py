@@ -158,29 +158,31 @@ class TableOfRunners:
     """A class to create the table(s) used to display the location of the runners."""
     def __init__(self) -> None:
         aframe = ttk.Frame()
+        for x in range(3):
+            frm = the_view()
+            frm.tv.insert(aframe,'end',None,[x,"Todd",str(34+x),'A',"2023-04-03 12:34"])
+            frm.grid(row=x,column=0)
     
-        pass
 
-    def the_view(self) -> ttk.Frame:
-        aframe = ttk.Frame()
-        aframe.pack()
+class the_view:
+    aframe = ttk.Frame()
+    aframe.pack()
 
-        tv = ttk.Treeview(aframe)
-        tv['columns'] = ('Participant','Bib','Checkpoint','Time')
-        tv.column("#0",width=0, stretch="NO")
-        tv.column("Participant",anchor="w",width=80)
-        tv.column("Bib",anchor="w",width=50)
-        tv.column("Checkpoint",anchor="w",width=80)
-        tv.column("Time",anchor="w",width=80)
+    tv = ttk.Treeview(aframe)
+    tv['columns'] = ('Participant','Bib','Checkpoint','Time')
+    tv.column("#0",width=0, stretch="NO")
+    tv.column("Participant",anchor="w",width=80)
+    tv.column("Bib",anchor="w",width=50)
+    tv.column("Checkpoint",anchor="w",width=80)
+    tv.column("Time",anchor="w",width=80)
 
-        tv.heading("#0",text="",anchor="w")
-        tv.heading("Participant",text="Participant",anchor="w")
-        tv.heading("Bib",text="Bib",anchor="w")
-        tv.heading("Time",text="Time",anchor="w")
+    tv.heading("#0",text="",anchor="w")
+    tv.heading("Participant",text="Participant",anchor="w")
+    tv.heading("Bib",text="Bib",anchor="w")
+    tv.heading("Time",text="Time",anchor="w")
 
-        tv.pack()
+    tv.pack()
 
-        return aframe
             
 
 
