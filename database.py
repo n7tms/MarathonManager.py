@@ -161,7 +161,7 @@ class MMDatabase:
                 EventID	INTEGER,
                 CheckpointID	INTEGER,
                 ParticipantID	INTEGER,
-                Sitingtime	TEXT,
+                SitingTime	TEXT,
                 PRIMARY KEY(SitingID AUTOINCREMENT)
             );"""
         self.cur.execute(sStmt)
