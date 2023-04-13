@@ -31,7 +31,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         rows = DB.query(stmt)
 
         for row in rows:
-            rowvalues = (row['SitingID'], row['Sitingtime'], row['CPName'], row['ParticipantID'], row['BibName'])
+            rowvalues = (row['SitingID'], row['SitingTime'], row['CPName'], row['ParticipantID'], row['BibName'])
             tv.insert("",'end',values=rowvalues,tags=str(row['SitingID']))
 
     def get_checkpoints() -> list:
@@ -100,7 +100,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
                 partID = res[0]['ParticipantID']
 
                 # add the siting to the sitings table
-                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, Sitingtime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M") + "');"
+                stmt = "insert into Sitings (EventID, CheckpointID, ParticipantID, SitingTime) values (1," + str(cid) + "," + str(partID) + ",'" + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "');"
                 res =  DB.nonQuery(stmt)
 
             status = str(count) + " bibs submitted Successfully at " + datetime.now().strftime("%H:%M:%S")
