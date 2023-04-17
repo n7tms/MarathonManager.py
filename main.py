@@ -225,7 +225,7 @@ class MainWindow:
         root.title("MM: Reports")
         root.geometry('825x340')
         # ew = checkpoint_window(root)
-        show_report()
+        show_report(root)
 
         
     def open_log(self):

@@ -9,6 +9,7 @@
 #   list of overdue runners (bib, name, phone, econtact, last checkpoint, elapsed time since last seen, next checkpoint)
 
 from constants import *
+from tkinter import *
 from tkinter import ttk
 
 class Reports:
@@ -151,7 +152,7 @@ class Reports:
         ORDER BY s.CheckpointID ASC, s.SitingTime ASC;"""
         results = DB.query(stmt,[cid])
         
-        print(results)
+        return results
 
 
 class TableOfRunners:
@@ -165,30 +166,36 @@ class TableOfRunners:
     
 
 class the_view:
-    aframe = ttk.Frame()
-    aframe.pack()
 
-    tv = ttk.Treeview(aframe)
-    tv['columns'] = ('Participant','Bib','Checkpoint','Time')
-    tv.column("#0",width=0, stretch="NO")
-    tv.column("Participant",anchor="w",width=80)
-    tv.column("Bib",anchor="w",width=50)
-    tv.column("Checkpoint",anchor="w",width=80)
-    tv.column("Time",anchor="w",width=80)
+    def __init__(self,parent) -> None:
+        self.parent_frame = parent
 
-    tv.heading("#0",text="",anchor="w")
-    tv.heading("Participant",text="Participant",anchor="w")
-    tv.heading("Bib",text="Bib",anchor="w")
-    tv.heading("Time",text="Time",anchor="w")
+        self.tv = ttk.Treeview(self.parent_frame)
+        self.tv['columns'] = ('Participant','Bib','Checkpoint','Time')
+        self.tv.column("#0",width=0, stretch="NO")
+        self.tv.column("Participant",anchor="w",width=80)
+        self.tv.column("Bib",anchor="w",width=50)
+        self.tv.column("Checkpoint",anchor="w",width=80)
+        self.tv.column("Time",anchor="w",width=80)
 
-    tv.pack()
+        self.tv.heading("#0",text="",anchor="w")
+        self.tv.heading("Participant",text="Participant",anchor="w")
+        self.tv.heading("Bib",text="Bib",anchor="w")
+        self.tv.heading("Checkpoint",text="Checkpoint",anchor="w")
+        self.tv.heading("Time",text="Time",anchor="w")
+
+        self.tv.pack()
 
             
 
 
 
-def show_report():
+def show_report(win):
     r = Reports()
+    nb = ttk.Notebook(win)
+    # tabs = []
+
+
     # r.lead_runner(1)    # find the lead runner for courseID 4 (30K)
     # r.last_runner(1)
 
@@ -196,6 +203,23 @@ def show_report():
     stmt = """Select CourseID, CourseName, Color FROM Courses"""
     courses = DB.query(stmt)
     # interate through all courses
-    for course in courses:
+    for i,course in enumerate(courses):
+        # Create a tab for a course
+        newtab = Frame(nb)
+        ttk.Label(newtab,text=course["CourseName"],width=50).pack()
+
+        # query the database for runners in this course
         # {'CourseID': 7, 'CourseName': '12K', 'Color': '#4f53f2'}
-        r.location_all_runners(course["CourseID"])
+        results = r.location_all_runners(course["CourseID"])
+
+        # Display the results on this tab
+        v = the_view(newtab)
+        for res in results:
+            row = [res['Firstname'] + ' ' + res['Lastname'],res['Bib'],res['cn'],res['SitingTime']]
+            v.tv.insert("",'end',values=row)
+
+
+        # tabs.append(newtab)
+        nb.add(newtab,text=course["CourseName"])
+
+    nb.pack()
