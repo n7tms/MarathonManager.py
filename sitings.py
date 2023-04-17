@@ -131,11 +131,47 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         main_frame.destroy()
         return
 
+    # TODO Implement the edit siting function
     def sitings_edit_row(event):
+        def submit_edit(xsid,xtime,xbib):
+            pass
+    
         item = tvSitings.item(tvSitings.focus(),"values")
         sid,timestamp,cp,pid,participant = tvSitings.item(tvSitings.focus(),"values")
         # print(item)
-        messagebox.showinfo(title="MM: Info",message="Edit not yet implemented.",parent=main_frame)
+        # messagebox.showinfo(title="MM: Info",message="Edit not yet implemented.",parent=main_frame)
+
+        # Retrieve the siting data from the database
+        stmt = 'select SitingID, CheckpointID, s.ParticipantID, Bib, SitingTime from Sitings s, Participants p where s.ParticipantID = p.ParticipantID and s.SitingID = ?'
+        result = DB.query(stmt,[sid])
+
+        # Create a new window with SitingID, Time, Checkpoint and Bib
+        edit_win = tk.Tk()
+        edit_win.title="MM: Edit Siting"
+        eTime = tk.StringVar()
+        eBib = tk.StringVar()
+
+        eTime.set(result[0]['SitingTime'])
+        eBib.set(str(result[0]['Bib']))
+
+
+
+        txtTime = ttk.Entry(edit_win,width=10,background='#ffffff',textvariable=eTime)
+        txtTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
+        # txtTime.config(anchor='center')
+
+        cmbCheckpoint = ttk.Combobox(edit_win,width=10,values=get_checkpoints())
+        cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
+        cmbCheckpoint.set(list(checkpoints.keys())[0]) 
+
+        txtBibs = ttk.Entry(edit_win,width=30,textvariable=eBib)
+        txtBibs.grid(row=0,column=2,sticky='W', padx=5, pady=8)
+
+        butSubmit = ttk.Button(main_frame,text='Submit',width=10,command=submit_edit)
+        butSubmit.grid(row=0,column=3,sticky='W', padx=5, pady=8)
+
+        
+        # Is there a way to make this form modal?
 
 
     # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
