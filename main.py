@@ -223,7 +223,7 @@ class MainWindow:
     def open_reports(self):
         root = Tk()
         root.title("MM: Reports")
-        root.geometry('825x340')
+        root.geometry('525x340')
         # ew = checkpoint_window(root)
         show_report(root)
 

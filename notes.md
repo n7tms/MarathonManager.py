@@ -1,7 +1,7 @@
 # Notes for Marathon Manager
 
 ## TODO
-- [ ] 
+- [ ] Add the Lead & Last runner to the report screen
 
 
 - [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)

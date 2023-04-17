@@ -154,17 +154,7 @@ class Reports:
         
         return results
 
-
-class TableOfRunners:
-    """A class to create the table(s) used to display the location of the runners."""
-    def __init__(self) -> None:
-        aframe = ttk.Frame()
-        for x in range(3):
-            frm = the_view()
-            frm.tv.insert(aframe,'end',None,[x,"Todd",str(34+x),'A',"2023-04-03 12:34"])
-            frm.grid(row=x,column=0)
     
-
 class the_view:
 
     def __init__(self,parent) -> None:
@@ -173,10 +163,10 @@ class the_view:
         self.tv = ttk.Treeview(self.parent_frame)
         self.tv['columns'] = ('Participant','Bib','Checkpoint','Time')
         self.tv.column("#0",width=0, stretch="NO")
-        self.tv.column("Participant",anchor="w",width=80)
-        self.tv.column("Bib",anchor="w",width=50)
-        self.tv.column("Checkpoint",anchor="w",width=80)
-        self.tv.column("Time",anchor="w",width=80)
+        self.tv.column("Participant",anchor="w",width=160)
+        self.tv.column("Bib",anchor="w",width=60)
+        self.tv.column("Checkpoint",anchor="w",width=100)
+        self.tv.column("Time",anchor="w",width=160)
 
         self.tv.heading("#0",text="",anchor="w")
         self.tv.heading("Participant",text="Participant",anchor="w")
@@ -188,13 +178,9 @@ class the_view:
 
             
 
-
-
 def show_report(win):
     r = Reports()
     nb = ttk.Notebook(win)
-    # tabs = []
-
 
     # r.lead_runner(1)    # find the lead runner for courseID 4 (30K)
     # r.last_runner(1)
@@ -202,11 +188,12 @@ def show_report(win):
     # get a list of all of the course in this event
     stmt = """Select CourseID, CourseName, Color FROM Courses"""
     courses = DB.query(stmt)
+
     # interate through all courses
     for i,course in enumerate(courses):
         # Create a tab for a course
         newtab = Frame(nb)
-        ttk.Label(newtab,text=course["CourseName"],width=50).pack()
+        ttk.Label(newtab,text='Course: ' + course["CourseName"],width=50).pack()
 
         # query the database for runners in this course
         # {'CourseID': 7, 'CourseName': '12K', 'Color': '#4f53f2'}
@@ -218,8 +205,8 @@ def show_report(win):
             row = [res['Firstname'] + ' ' + res['Lastname'],res['Bib'],res['cn'],res['SitingTime']]
             v.tv.insert("",'end',values=row)
 
-
-        # tabs.append(newtab)
+        # add THIS tab to the notebook
         nb.add(newtab,text=course["CourseName"])
 
-    nb.pack()
+    # pack the whole notebook
+    nb.pack(expand=True,fill='both')
