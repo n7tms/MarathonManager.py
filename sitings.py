@@ -133,11 +133,9 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
     # TODO Implement the edit siting function
     def sitings_edit_row(event):
-        eTime = tk.StringVar()
-        eBib = tk.StringVar()
-
-        def submit_edit(xsid,xtime,xbib):
-            pass
+        # def submit_edit(xsid,xtime,xbib):
+        def submit_edit():
+            messagebox.showinfo(title="MM: Info",message="bib: " + eBib.get(),parent=main_frame)
     
         item = tvSitings.item(tvSitings.focus(),"values")
         sid,timestamp,cp,pid,participant = tvSitings.item(tvSitings.focus(),"values")
@@ -151,6 +149,9 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         # Create a new window with SitingID, Time, Checkpoint and Bib
         edit_win = tk.Tk()
         edit_win.title("MM: Edit Siting")
+        eTime = tk.StringVar(edit_win,result[0]['SitingTime'])
+        eBib = tk.StringVar(edit_win,result[0]['Bib'])
+
 
         txtTime = ttk.Entry(edit_win,width=20,background='#ffffff',textvariable=eTime)
         txtTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
@@ -165,11 +166,11 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         butSubmit = ttk.Button(edit_win,text='Submit',width=10,command=submit_edit)
         butSubmit.grid(row=0,column=3,sticky='W', padx=5, pady=8)
 
-        txtTime.delete(0,'end')
-        txtTime.insert(0,result[0]['SitingTime'])
+        # txtTime.delete(0,'end')
+        # txtTime.insert(0,result[0]['SitingTime'])
 
-        txtBibs.delete(0,'end')
-        txtBibs.insert(0,str(result[0]['Bib']))
+        # txtBibs.delete(0,'end')
+        # txtBibs.insert(0,str(result[0]['Bib']))
         cmbCheckpoint.delete(0,'end')
         cmbCheckpoint.insert(0,result[0]['CPName'])
 
