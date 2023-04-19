@@ -134,8 +134,24 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
     # TODO Implement the edit siting function
     def sitings_edit_row(event):
         # def submit_edit(xsid,xtime,xbib):
-        def submit_edit():
-            messagebox.showinfo(title="MM: Info",message="bib: " + eBib.get(),parent=main_frame)
+        def submit_edit(sid):
+            # lookup the checkpoint ID
+            stmt = "select CheckpointID from Checkpoints where CPName = ?;"
+            res = DB.query(stmt,[eCP.get()])
+            sCPID = res[0]['CheckpointID']
+
+            # lookup up the participant ID
+            stmt = "select ParticipantID from Participants where Bib = ?;"
+            res = DB.query(stmt,[eBib.get()])
+            sPID = res[0]['ParticipantID']
+
+            # update the record (sid)
+            stmt = "update Sitings set SitingTime=?, CheckpointID=?, ParticipantID=? where SitingID=?"
+            DB.nonQuery(stmt,[eTime.get(),sCPID,sPID,sid])
+            messagebox.showinfo(title="MM: Info",message=[eTime.get(),sCPID,sPID,sid],parent=main_frame)
+            sitings_filldata(tvSitings)
+            edit_win.destroy()
+
     
         item = tvSitings.item(tvSitings.focus(),"values")
         sid,timestamp,cp,pid,participant = tvSitings.item(tvSitings.focus(),"values")
@@ -151,28 +167,27 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         edit_win.title("MM: Edit Siting")
         eTime = tk.StringVar(edit_win,result[0]['SitingTime'])
         eBib = tk.StringVar(edit_win,result[0]['Bib'])
+        eCP = tk.StringVar(edit_win,result[0]['CPName'])
 
 
         txtTime = ttk.Entry(edit_win,width=20,background='#ffffff',textvariable=eTime)
         txtTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
 
-        cmbCheckpoint = ttk.Combobox(edit_win,width=10,values=get_checkpoints())
+        cmbCheckpoint = ttk.Combobox(edit_win,width=10,values=get_checkpoints(),textvariable=eCP)
         cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
         cmbCheckpoint.set(list(checkpoints.keys())[0]) 
 
-        txtBibs = ttk.Entry(edit_win,width=10,textvariable=eBib)
-        txtBibs.grid(row=0,column=2,sticky='W', padx=5, pady=8)
+        txtBib = ttk.Entry(edit_win,width=10,textvariable=eBib)
+        txtBib.grid(row=0,column=2,sticky='W', padx=5, pady=8)
 
-        butSubmit = ttk.Button(edit_win,text='Submit',width=10,command=submit_edit)
+        butSubmit = ttk.Button(edit_win,text='Submit',width=10,command=lambda: submit_edit(result[0]['SitingID']))
         butSubmit.grid(row=0,column=3,sticky='W', padx=5, pady=8)
 
-        # txtTime.delete(0,'end')
-        # txtTime.insert(0,result[0]['SitingTime'])
-
-        # txtBibs.delete(0,'end')
-        # txtBibs.insert(0,str(result[0]['Bib']))
         cmbCheckpoint.delete(0,'end')
         cmbCheckpoint.insert(0,result[0]['CPName'])
+
+        # eTime.set(result[0]['SitingTime'])
+        # txtTime.configure(te)
 
 
         # Is there a way to make this form modal?
