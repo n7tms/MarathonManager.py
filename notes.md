@@ -69,5 +69,7 @@ Here is a "panel" manager: https://www.youtube.com/watch?v=9Hyltpk2tSM&list=PLCC
 ## NOTES
 
 How to store id "in" combobox: https://www.plus2net.com/python/tkinter-Combobox-mysql.php
- 
+
+rowcount works!
+
 

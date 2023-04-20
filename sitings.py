@@ -132,7 +132,12 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         return
 
     def sitings_edit_row(event):
-        # def submit_edit(xsid,xtime,xbib):
+
+        def testing():
+            stmt = "update Sitings set EventID=1 where SitingID=12;"
+            cnt = DB.nonQuery(stmt)
+            print(cnt.rowcount)
+
         def submit_edit(sid):
             errors = False
             # lookup the checkpoint ID
