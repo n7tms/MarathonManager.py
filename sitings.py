@@ -131,26 +131,44 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         main_frame.destroy()
         return
 
-    # TODO Implement the edit siting function
     def sitings_edit_row(event):
         # def submit_edit(xsid,xtime,xbib):
         def submit_edit(sid):
+            errors = False
             # lookup the checkpoint ID
             stmt = "select CheckpointID from Checkpoints where CPName = ?;"
             res = DB.query(stmt,[eCP.get()])
-            sCPID = res[0]['CheckpointID']
+            if len(res) < 1:
+                messagebox.showinfo(title="MM: Error",message="Checkpoint " + eCP.get() + " does not exist.",parent=main_frame)
+                errors = True
+            else:
+                sCPID = res[0]['CheckpointID']
 
             # lookup up the participant ID
             stmt = "select ParticipantID from Participants where Bib = ?;"
             res = DB.query(stmt,[eBib.get()])
-            sPID = res[0]['ParticipantID']
+            if len(res) < 1:
+                answer = messagebox.askyesno(title="MM: Error",message="Bib " + eBib.get() + " does not exist. Add it?",parent=main_frame)
+                if answer:
+                    # add the bib to the db
+                    stmt = "insert into Participants (EventID,Firstname,Lastname,CourseID,Bib) values (1,'','',0,?);"
+                    DB.nonQuery(stmt,[eBib.get()])
 
-            # update the record (sid)
-            stmt = "update Sitings set SitingTime=?, CheckpointID=?, ParticipantID=? where SitingID=?"
-            DB.nonQuery(stmt,[eTime.get(),sCPID,sPID,sid])
-            messagebox.showinfo(title="MM: Info",message=[eTime.get(),sCPID,sPID,sid],parent=main_frame)
-            sitings_filldata(tvSitings)
-            edit_win.destroy()
+                    # get the participant ID of the added bib
+                    stmt = "select ParticipantID from Participants where Bib = ?;"
+                    res = DB.query(stmt,[eBib.get()])
+                    sPID = res[0]['ParticipantID']
+                else:
+                    errors = True
+            else:
+                sPID = res[0]['ParticipantID']
+
+            if not errors:
+                # update the record (sid)
+                stmt = "update Sitings set SitingTime=?, CheckpointID=?, ParticipantID=? where SitingID=?"
+                DB.nonQuery(stmt,[eTime.get(),sCPID,sPID,sid])
+                sitings_filldata(tvSitings)
+                edit_win.destroy()
 
     
         item = tvSitings.item(tvSitings.focus(),"values")

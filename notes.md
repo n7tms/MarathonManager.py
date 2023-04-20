@@ -2,6 +2,7 @@
 
 ## TODO
 - [ ] Add the Lead & Last runner to the report screen
+- [ ] Create a view of runners that looks like a spreadsheet: bibs on the Y, checkpoints on the X; colored cells to show progress
 
 
 - [ ] Store adhoc bibs in an unknown course; list unknowns in a separate "course" (eg. 5K, 12K, Unknown)
@@ -9,7 +10,6 @@
 - [ ] When calculating lead/last or current location, use the path table so everything is linear
 
 
-- [ ] Create the edit siting window and function
 - [ ] need to make sure tick (and quotes?) are not used in queries.
 - [ ] Modify participant table to handle teams (relay)
 
@@ -44,6 +44,7 @@
 - [x] Fix sitings to deal with the new database class
 - [x] incorporate a history in the file menu
 - [x] Fix checkboxes on Participant form
+- [x] Create the edit siting window and function
 
 
 
