@@ -175,18 +175,26 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
                 sitings_filldata(tvSitings)
                 edit_win.destroy()
 
+        def cancel_edit():
+            edit_win.destroy()
+
+        def delete_edit(sid):
+            answer = messagebox.askyesno(title="MM: Delete",message="Are you sure you want to delete this siting entry?",parent=edit_win)
+            if answer:
+                DB.nonQuery("delete from Sitings where SitingID=?",[sid])
+                sitings_filldata(tvSitings)
+                edit_win.destroy()
     
         item = tvSitings.item(tvSitings.focus(),"values")
         sid,timestamp,cp,pid,participant = tvSitings.item(tvSitings.focus(),"values")
-        # print(item)
-        # messagebox.showinfo(title="MM: Info",message="Edit not yet implemented.",parent=main_frame)
 
         # Retrieve the siting data from the database
         stmt = 'select SitingID, s.CheckpointID, CPName, s.ParticipantID, Bib, SitingTime from Sitings s, Participants p, Checkpoints c where s.CheckpointID=c.CheckpointID and s.ParticipantID = p.ParticipantID and s.SitingID = ?'
         result = DB.query(stmt,[sid])
 
         # Create a new window with SitingID, Time, Checkpoint and Bib
-        edit_win = tk.Tk()
+        edit_win = tk.Toplevel(main_frame)
+
         edit_win.title("MM: Edit Siting")
         eTime = tk.StringVar(edit_win,result[0]['SitingTime'])
         eBib = tk.StringVar(edit_win,result[0]['Bib'])
@@ -195,6 +203,7 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
 
         txtTime = ttk.Entry(edit_win,width=20,background='#ffffff',textvariable=eTime)
         txtTime.grid(row=0,column=0,sticky='W', padx=5, pady=8)
+        txtTime.focus_set()
 
         cmbCheckpoint = ttk.Combobox(edit_win,width=10,values=get_checkpoints(),textvariable=eCP)
         cmbCheckpoint.grid(row=0,column=1,sticky='W',  padx=5, pady=8)
@@ -206,14 +215,19 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
         butSubmit = ttk.Button(edit_win,text='Submit',width=10,command=lambda: submit_edit(result[0]['SitingID']))
         butSubmit.grid(row=0,column=3,sticky='W', padx=5, pady=8)
 
+        butDelete = ttk.Button(edit_win,text='Delete',width=10,command=lambda: delete_edit(result[0]['SitingID']))
+        butDelete.grid(row=0,column=4,sticky='W', padx=5, pady=8)
+
+        butCancel = ttk.Button(edit_win,text='Cancel',width=10,command=cancel_edit)
+        butCancel.grid(row=0,column=5,sticky='W', padx=5, pady=8)
+
         cmbCheckpoint.delete(0,'end')
         cmbCheckpoint.insert(0,result[0]['CPName'])
 
-        # eTime.set(result[0]['SitingTime'])
-        # txtTime.configure(te)
-
-
-        # Is there a way to make this form modal?
+        # Is there a way to make this form modal? Yes!
+        edit_win.wait_visibility()
+        edit_win.grab_set()
+        # edit_win.grab_set_global()
 
 
     # sf = tk.Frame(main_frame,highlightbackground='blue',highlightthickness=1)
