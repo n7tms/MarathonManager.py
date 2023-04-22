@@ -3,8 +3,6 @@
 # Sitings Functions
 #
 
-
-
 from pathlib import Path
 from tkinter import ttk
 import tkinter as tk
@@ -21,7 +19,6 @@ from constants import *
 
 def siting_window(main_frame: tk.Frame) -> tk.Frame:
     checkpoints = {}
-    after_id = ''
 
     def sitings_filldata(tv:ttk.Treeview):
         for item in tv.get_children():
@@ -44,7 +41,6 @@ def siting_window(main_frame: tk.Frame) -> tk.Frame:
             checkpoints[x["CPName"]] = x["CheckpointID"]
         
         return list(checkpoints.keys()) 
-
 
     def bib_enterkey(event):
         """Check if the Enter key was pressed from inside the bib text field"""
